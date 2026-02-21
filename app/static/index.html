@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PuneRakshak - Disaster Risk Assessment System</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f0f2f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .status-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+
+    .sidebar {
+      width: 320px;
+      background: white;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+      overflow-y: auto;
+    }
+
+    .map-container {
+      flex: 1;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .panel {
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-card p {
+      font-size: 11px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .weather-panel {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .weather-panel h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      opacity: 0.95;
+    }
+
+    .weather-data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .weather-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .risk-panel {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .risk-panel h3 {
+      font-size: 14px;
+      color: #92400e;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .risk-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      color: #78350f;
+    }
+
+    .risk-level {
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .risk-low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .risk-medium {
+      background: #fed7aa;
+      color: #92400e;
+    }
+
+    .risk-high {
+      background: #fecaca;
+      color: #991b1b;
+    }
+
+    .legend {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .legend h4 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .legend-color {
+      width: 30px;
+      height: 20px;
+      margin-right: 10px;
+      border-radius: 3px;
+      border: 1px solid #d1d5db;
+    }
+
+    .info-panel {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .footer {
+      background: white;
+      padding: 8px 20px;
+      text-align: center;
+      font-size: 11px;
+      color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">🛡️</div>
+      <div class="header-title">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span>System Active</span>
+      </div>
+      <div class="status-badge">
+        <span id="currentTime"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <div class="panel">
+        <h2>📊 Coverage Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3 id="totalCells">-</h3>
+            <p>Grid Cells</p>
+          </div>
+          <div class="stat-card">
+            <h3>250m</h3>
+            <p>Resolution</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="coverageArea">-</h3>
+            <p>Area (km²)</p>
+          </div>
+          <div class="stat-card">
+            <h3>Pune</h3>
+            <p>City</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>🌦️ Real-time Weather</h2>
+        <div id="weatherPanel" class="weather-panel">
+          <h3>Current Conditions - Pune</h3>
+          <div class="weather-data" id="weatherData">
+            <div class="weather-item">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="riskPanel" class="risk-panel">
+          <h3>⚠️ Risk Assessment</h3>
+          <div id="riskData">
+            <div class="risk-item">
+              <span>Analyzing...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📍 Legend</h2>
+        <div class="legend">
+          <h4>Flood Risk Levels</h4>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #10b981;"></div>
+            <span>Low Risk (&lt;0.5m)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f59e0b;"></div>
+            <span>Medium Risk (0.5-1.5m)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444;"></div>
+            <span>High Risk (&gt;1.5m)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="info-panel">
+          <strong>ℹ️ System Information</strong><br>
+          This platform provides real-time disaster risk assessment for Pune city using a 250m × 250m spatial grid. Each
+          cell contains computed risk indicators based on elevation, drainage proximity, population density, and current
+          weather conditions.
+        </div>
+      </div>
+    </div>
+
+    <div class="map-container">
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Pune Risk Assessment Grid...</div>
+      </div>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2026 PuneRakshak - Disaster Risk Assessment System | Powered by Real-time Spatial Analytics
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Initialize map centered on Pune
+    const map = L.map('map').setView([18.5204, 73.8567], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(map);
+
+    let gridLayer = null;
+
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Load grid cells automatically
+    async function loadGridCells() {
+      try {
+        const response = await fetch('/demo/grid-geojson');
+        const data = await response.json();
+
+        if (gridLayer) {
+          map.removeLayer(gridLayer);
+        }
+
+        if (data.features && data.features.length > 0) {
+          gridLayer = L.geoJSON(data, {
+            style: function (feature) {
+              const props = feature.properties;
+              const floodDepth = props.flood_depth_avg || 0;
+
+              let color = '#10b981'; // Low risk
+              if (floodDepth > 1.5) color = '#ef4444'; // High risk
+              else if (floodDepth > 0.5) color = '#f59e0b'; // Medium risk
+
+              return {
+                fillColor: color,
+                weight: 0.2,
+                opacity: 0.2,
+                color: '#94a3b8',
+                fillOpacity: 0.5
+              };
+            },
+            onEachFeature: function (feature, layer) {
+              const props = feature.properties;
+
+              layer.on('mouseover', function (e) {
+                const layer = e.target;
+                layer.setStyle({
+                  weight: 2,
+                  color: '#1e40af',
+                  fillOpacity: 0.8
+                });
+              });
+
+              layer.on('mouseout', function (e) {
+                gridLayer.resetStyle(e.target);
+              });
+
+              const popup = `
+                <div style="font-family: Arial, sans-serif; min-width: 220px;">
+                  <h3 style="margin: 0 0 12px 0; color: #1e40af; font-size: 15px; border-bottom: 2px solid #3b82f6; padding-bottom: 6px;">Grid Cell #${props.id}</h3>
+                  <table style="width: 100%; font-size: 12px;">
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Elevation:</strong></td><td style="text-align: right;">${props.elevation_mean?.toFixed(1) || 'N/A'} m</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Drain Distance:</strong></td><td style="text-align: right;">${(props.drain_distance / 1000)?.toFixed(2) || 'N/A'} km</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Land Use:</strong></td><td style="text-align: right;">${props.land_use || 'N/A'}</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Population:</strong></td><td style="text-align: right;">${(props.population_density * 62500)?.toFixed(0) || 'N/A'}</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Slum Density:</strong></td><td style="text-align: right;">${props.slum_density?.toFixed(1) || 'N/A'}%</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb; background: #fef3c7;"><td style="padding: 6px 0;"><strong>Flood Depth:</strong></td><td style="text-align: right; font-weight: 600; color: #92400e;">${props.flood_depth_avg?.toFixed(2) || 'N/A'} m</td></tr>
+                    <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Infrastructure:</strong></td><td style="text-align: right;">${props.infra_count || 0} facilities</td></tr>
+                    <tr><td style="padding: 6px 0;"><strong>Complaints:</strong></td><td style="text-align: right;">${props.complaint_density?.toFixed(1) || 'N/A'}/km²</td></tr>
+                  </table>
+                </div>
+              `;
+              layer.bindPopup(popup);
+            }
+          }).addTo(map);
+
+          map.fitBounds(gridLayer.getBounds());
+
+          // Update stats
+          document.getElementById('totalCells').textContent = data.features.length.toLocaleString();
+          const area = (data.features.length * 0.0625).toFixed(1); // 250m x 250m = 0.0625 km²
+          document.getElementById('coverageArea').textContent = area;
+
+          // Hide loading overlay
+          document.getElementById('loadingOverlay').style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error loading grid cells:', error);
+        document.getElementById('loadingOverlay').innerHTML = '<div style="color: #ef4444;">Error loading grid data</div>';
+      }
+    }
+
+    // Load weather data
+    async function loadWeatherData() {
+      try {
+        const response = await fetch('/realtime/disaster-summary');
+        const data = await response.json();
+
+        if (response.ok) {
+          const weatherHTML = `
+            <div class="weather-item">
+              <span>🌡️ Temperature</span>
+              <strong>${data.current_conditions.temperature}°C</strong>
+            </div>
+            <div class="weather-item">
+              <span>💧 Humidity</span>
+              <strong>${data.current_conditions.humidity}%</strong>
+            </div>
+            <div class="weather-item">
+              <span>💨 Wind Speed</span>
+              <strong>${data.current_conditions.wind_speed} m/s</strong>
+            </div>
+            <div class="weather-item">
+              <span>🌧️ Rainfall</span>
+              <strong>${data.current_conditions.rain_now} mm</strong>
+            </div>
+          `;
+          document.getElementById('weatherData').innerHTML = weatherHTML;
+
+          const riskHTML = `
+            <div class="risk-item">
+              <span>Flood Risk (Now)</span>
+              <span class="risk-level risk-${data.risk_assessment.flood_risk_now.toLowerCase()}">${data.risk_assessment.flood_risk_now}</span>
+            </div>
+            <div class="risk-item">
+              <span>Flood Risk (24h)</span>
+              <span class="risk-level risk-${data.risk_assessment.flood_risk_24h.toLowerCase()}">${data.risk_assessment.flood_risk_24h}</span>
+            </div>
+            <div class="risk-item">
+              <span>Heat Risk</span>
+              <span class="risk-level risk-${data.risk_assessment.heat_risk.toLowerCase()}">${data.risk_assessment.heat_risk}</span>
+            </div>
+            <div class="risk-item">
+              <span>Storm Risk</span>
+              <span class="risk-level risk-${data.risk_assessment.storm_risk.toLowerCase()}">${data.risk_assessment.storm_risk}</span>
+            </div>
+          `;
+          document.getElementById('riskData').innerHTML = riskHTML;
+        }
+      } catch (error) {
+        console.error('Error loading weather data:', error);
+      }
+    }
+
+    // Auto-load on page load
+    window.addEventListener('load', () => {
+      loadGridCells();
+      loadWeatherData();
+
+      // Refresh weather every 5 minutes
+      setInterval(loadWeatherData, 300000);
+    });
+  </script>
+</body>
+
+</html>
