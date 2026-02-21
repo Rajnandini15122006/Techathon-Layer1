@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.database import init_db
-from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid, hrvc_risk, risk, usps, liquid_galaxy, drainage, decision
+from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid, hrvc_risk, risk, usps, liquid_galaxy, drainage, decision, risk_memory, monitoring
 import logging
 import os
 
@@ -50,6 +50,8 @@ app.include_router(usps.router)
 app.include_router(liquid_galaxy.router)
 app.include_router(drainage.router)
 app.include_router(decision.router)
+app.include_router(risk_memory.router)
+app.include_router(monitoring.router)
 if PRODUCTION_GRID_AVAILABLE:
     app.include_router(production_grid.router)
     logger.info("Production grid generation enabled")
@@ -58,6 +60,14 @@ if PRODUCTION_GRID_AVAILABLE:
 async def startup_event():
     """Initialize database on startup"""
     logger.info("Initializing database...")
+    
+    # Import all models to ensure they're registered with SQLAlchemy
+    try:
+        from app.models import grid_cell, risk_memory, monitoring
+        logger.info("Models imported successfully")
+    except Exception as e:
+        logger.warning(f"Error importing models: {e}")
+    
     init_db()
     logger.info("Database initialized successfully")
 

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Control Center - PuneRakshak</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #2c3e50
+    }
+
+    .header {
+      background: #1e40af;
+      color: white;
+      padding: 14px 32px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+    }
+
+    .header h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .header-subtitle {
+      font-size: 0.85em;
+      opacity: 0.9
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap
+    }
+
+    .nav a {
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.85em;
+      border-bottom: 2px solid transparent
+    }
+
+    .nav a:hover {
+      background: rgba(255, 255, 255, 0.2)
+    }
+
+    .nav a.active {
+      background: rgba(255, 255, 255, 0.15);
+      border-bottom-color: white
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 0 20px
+    }
+
+    .control-panel {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px
+    }
+
+    .control-panel h2 {
+      color: #1e40af;
+      margin-bottom: 16px;
+      font-size: 1.3em
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background: #1e40af;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .btn:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px)
+    }
+
+    .btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #1e40af
+    }
+
+    .stat-card.success {
+      border-left-color: #10b981
+    }
+
+    .stat-card.warning {
+      border-left-color: #f59e0b
+    }
+
+    .stat-card.danger {
+      border-left-color: #ef4444
+    }
+
+    .stat-label {
+      font-size: 0.85em;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .section {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px
+    }
+
+    .section h3 {
+      color: #1e40af;
+      margin-bottom: 16px;
+      font-size: 1.1em;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px
+    }
+
+    .cycle-list {
+      max-height: 400px;
+      overflow-y: auto
+    }
+
+    .cycle-item {
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border-left: 4px solid #3b82f6
+    }
+
+    .cycle-item.success {
+      border-left-color: #10b981
+    }
+
+    .cycle-item.failed {
+      border-left-color: #ef4444
+    }
+
+    .cycle-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: 600
+    }
+
+    .cycle-details {
+      font-size: 0.85em;
+      color: #64748b
+    }
+
+    .alert-list {
+      max-height: 400px;
+      overflow-y: auto
+    }
+
+    .alert-item {
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #fef3c7;
+      border-radius: 6px;
+      border-left: 4px solid #f59e0b
+    }
+
+    .alert-item.critical {
+      background: #fee2e2;
+      border-left-color: #ef4444
+    }
+
+    .alert-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px
+    }
+
+    .alert-severity {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .severity-critical {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .severity-high_alert {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .severity-watch {
+      background: #dbeafe;
+      color: #1e40af
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px
+    }
+
+    .status-success {
+      background: #10b981
+    }
+
+    .status-failed {
+      background: #ef4444
+    }
+
+    .status-running {
+      background: #f59e0b;
+      animation: pulse 1.5s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.5
+      }
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #64748b
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <h1>Monitoring Control Center</h1>
+    <div class="header-subtitle">Real-Time System Monitoring & Alert Management</div>
+    <div class="nav">
+      <a href="/static/punerakshak.html">Risk Dashboard</a>
+      <a href="/static/alerts.html">Alerts</a>
+      <a href="/static/usps_dashboard.html">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html">Decision Engine</a>
+      <a href="/static/risk_evolution.html">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="active">Monitoring</a>
+      <a href="/static/community.html">Community</a>
+      <a href="/docs">API Docs</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="control-panel">
+      <h2>System Control</h2>
+      <button class="btn" id="runBtn" onclick="runMonitoring()">▶ Run Monitoring Cycle Now</button>
+      <button class="btn" onclick="refreshData()" style="margin-left: 10px; background: #64748b">🔄 Refresh
+        Data</button>
+      <div id="runResult" style="margin-top: 16px; padding: 12px; border-radius: 6px; display: none"></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card success">
+        <div class="stat-label">System Status</div>
+        <div class="stat-value" id="systemStatus">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Run</div>
+        <div class="stat-value" style="font-size: 1.2em" id="lastRun">-</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">Active Alerts</div>
+        <div class="stat-value" id="activeAlerts">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Rainfall</div>
+        <div class="stat-value" id="lastRainfall">-</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+      <div class="section">
+        <h3>Recent Monitoring Cycles</h3>
+        <div class="cycle-list" id="cycleList">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading cycles...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Active Alerts</h3>
+        <div class="alert-list" id="alertList">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading alerts...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function runMonitoring() {
+      const btn = document.getElementById('runBtn');
+      const result = document.getElementById('runResult');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Running...';
+      result.style.display = 'block';
+      result.style.background = '#dbeafe';
+      result.style.color = '#1e40af';
+      result.textContent = 'Monitoring cycle in progress...';
+
+      try {
+        const response = await fetch('/api/monitoring/run-now', { method: 'POST' });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          result.style.background = '#d1fae5';
+          result.style.color = '#065f46';
+          result.innerHTML = `✓ Monitoring cycle completed successfully!<br>
+            Duration: ${data.duration_seconds?.toFixed(2)}s | 
+            Grids: ${data.grids_updated} | 
+            Alerts: ${data.alerts_triggered}`;
+
+          setTimeout(() => refreshData(), 1000);
+        } else {
+          result.style.background = '#fee2e2';
+          result.style.color = '#991b1b';
+          result.textContent = '✗ Monitoring cycle failed: ' + (data.error || 'Unknown error');
+        }
+      } catch (error) {
+        result.style.background = '#fee2e2';
+        result.style.color = '#991b1b';
+        result.textContent = '✗ Error: ' + error.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '▶ Run Monitoring Cycle Now';
+      }
+    }
+
+    async function refreshData() {
+      await Promise.all([loadStatus(), loadCycles(), loadAlerts()]);
+    }
+
+    async function loadStatus() {
+      try {
+        const response = await fetch('/api/monitoring/status');
+        const data = await response.json();
+
+        document.getElementById('systemStatus').textContent = data.last_status || 'N/A';
+        document.getElementById('lastRun').textContent = data.last_run_time ?
+          new Date(data.last_run_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Never';
+        document.getElementById('activeAlerts').textContent = data.active_alerts || 0;
+        document.getElementById('lastRainfall').textContent = data.last_rainfall_mm ?
+          data.last_rainfall_mm.toFixed(1) + ' mm' : 'N/A';
+      } catch (error) {
+        console.error('Error loading status:', error);
+      }
+    }
+
+    async function loadCycles() {
+      try {
+        const response = await fetch('/api/monitoring/cycles?limit=10');
+        const cycles = await response.json();
+
+        const html = cycles.length > 0 ? cycles.map(cycle => {
+          const statusClass = cycle.status === 'success' ? 'success' : (cycle.status === 'failed' ? 'failed' : '');
+          const statusIcon = cycle.status === 'success' ? '✓' : (cycle.status === 'failed' ? '✗' : '⏳');
+
+          return `<div class="cycle-item ${statusClass}">
+            <div class="cycle-header">
+              <span><span class="status-indicator status-${cycle.status}"></span>${statusIcon} ${new Date(cycle.start_time).toLocaleString('en-IN')}</span>
+              <span>${cycle.duration_seconds?.toFixed(2)}s</span>
+            </div>
+            <div class="cycle-details">
+              Rainfall: ${cycle.rainfall_mm?.toFixed(1) || 0} mm | 
+              Grids: ${cycle.grids_updated || 0} | 
+              Alerts: ${cycle.alerts_triggered || 0}
+              ${cycle.error_message ? '<br><span style="color:#ef4444">Error: ' + cycle.error_message + '</span>' : ''}
+            </div>
+          </div>`;
+        }).join('') : '<p style="text-align:center;color:#64748b;padding:40px">No monitoring cycles yet</p>';
+
+        document.getElementById('cycleList').innerHTML = html;
+      } catch (error) {
+        document.getElementById('cycleList').innerHTML = '<p style="color:#ef4444;text-align:center">Error loading cycles</p>';
+      }
+    }
+
+    async function loadAlerts() {
+      try {
+        const response = await fetch('/api/monitoring/alerts/active');
+        const alerts = await response.json();
+
+        const html = alerts.length > 0 ? alerts.map(alert => {
+          const severityClass = `severity-${alert.severity}`;
+
+          return `<div class="alert-item ${alert.severity === 'critical' ? 'critical' : ''}">
+            <div class="alert-header">
+              <span><strong>${alert.grid_id}</strong></span>
+              <span class="alert-severity ${severityClass}">${alert.severity}</span>
+            </div>
+            <div style="font-size:0.9em;margin-bottom:8px">${alert.reason}</div>
+            <div style="font-size:0.85em;color:#64748b">
+              USPS: ${alert.usps_score?.toFixed(1)} | Risk: ${alert.risk_score?.toFixed(1)} | 
+              ${new Date(alert.created_at).toLocaleString('en-IN')}
+            </div>
+          </div>`;
+        }).join('') : '<p style="text-align:center;color:#64748b;padding:40px">No active alerts</p>';
+
+        document.getElementById('alertList').innerHTML = html;
+      } catch (error) {
+        document.getElementById('alertList').innerHTML = '<p style="color:#ef4444;text-align:center">Error loading alerts</p>';
+      }
+    }
+
+    // Initial load
+    refreshData();
+
+    // Auto-refresh every 30 seconds
+    setInterval(refreshData, 30000);
+  </script>
+</body>
+
+</html>

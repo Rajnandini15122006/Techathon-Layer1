@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Evolution Analytics - PuneRakshak</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #2c3e50;
+      overflow: hidden
+    }
+
+    .header {
+      background: #1e40af;
+      color: white;
+      padding: 14px 32px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+    }
+
+    .header h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .header-subtitle {
+      font-size: 0.85em;
+      opacity: 0.9
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px
+    }
+
+    .nav a {
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.85em;
+      border-bottom: 2px solid transparent
+    }
+
+    .nav a:hover {
+      background: rgba(255, 255, 255, 0.2)
+    }
+
+    .nav a.active {
+      background: rgba(255, 255, 255, 0.15);
+      border-bottom-color: white
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 110px);
+      overflow: hidden
+    }
+
+    .content-wrapper {
+      display: flex;
+      flex: 1;
+      overflow: hidden
+    }
+
+    .left-panel {
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      padding: 20px;
+      overflow-y: auto;
+      width: 260px;
+      flex-shrink: 0
+    }
+
+    .panel-section {
+      margin-bottom: 24px
+    }
+
+    .section-title {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .form-group {
+      margin-bottom: 16px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85em;
+      color: #475569;
+      margin-bottom: 6px;
+      font-weight: 600
+    }
+
+    .form-select,
+    .form-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.9em
+    }
+
+    .form-select:focus,
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #1e40af;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .btn:hover {
+      background: #1e3a8a
+    }
+
+    .btn-secondary {
+      background: #64748b
+    }
+
+    .btn-secondary:hover {
+      background: #475569
+    }
+
+    .legend {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb
+    }
+
+    .legend-title {
+      font-size: 0.85em;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 10px
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.85em
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.1)
+    }
+
+    .map-container {
+      position: relative;
+      background: #e5e7eb;
+      flex: 1;
+      height: 60%
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+    }
+
+    .map-controls label {
+      display: block;
+      font-size: 0.85em;
+      color: #475569;
+      margin-bottom: 6px;
+      font-weight: 600
+    }
+
+    .time-slider {
+      width: 200px
+    }
+
+    .right-panel {
+      background: #fff;
+      border-top: 2px solid #e5e7eb;
+      padding: 20px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 40%;
+      flex-shrink: 0
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+      align-items: start
+    }
+
+    .chart-container {
+      background: white;
+      padding: 16px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+      display: flex;
+      flex-direction: column
+    }
+
+    .chart-title {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 12px;
+      flex-shrink: 0
+    }
+
+    .chart-canvas {
+      height: 160px !important;
+      max-width: 100%
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid #1e40af;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center
+    }
+
+    .stat-label {
+      font-size: 0.75em;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .loading-text {
+      color: white;
+      margin-top: 16px;
+      font-size: 1.1em
+    }
+
+    .grid-info {
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border-left: 3px solid #1e40af
+    }
+
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 3px solid #3b82f6
+    }
+
+    .grid-info h3 {
+      font-size: 1em;
+      color: #1e40af;
+      margin-bottom: 8px
+    }
+
+    .grid-info p {
+      font-size: 0.85em;
+      color: #475569;
+      margin-bottom: 4px
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .status-stable {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .status-watchlist {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .status-emerging {
+      background: #fed7aa;
+      color: #9a3412
+    }
+
+    .status-chronic {
+      background: #fee2e2;
+      color: #991b1b
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div>
+      <div class="spinner"></div>
+      <div class="loading-text">Loading Analytics...</div>
+    </div>
+  </div>
+
+  <header class="header">
+    <h1>Risk Evolution Analytics</h1>
+    <div class="header-subtitle">Historical Risk Memory & Hotspot Evolution Tracking System</div>
+    <div class="nav">
+      <a href="/static/punerakshak.html">Risk Dashboard</a>
+      <a href="/static/alerts.html">Alerts</a>
+      <a href="/static/usps_dashboard.html">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="active">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html">Monitoring</a>
+      <a href="/static/community.html">Community</a>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="content-wrapper">
+      <aside class="left-panel">
+        <div class="panel-section">
+          <div class="section-title">Grid Selection</div>
+          <div class="form-group">
+            <label class="form-label">Select Ward/Grid</label>
+            <select class="form-select" id="grid-select" onchange="loadGridData()">
+              <option value="101">Kothrud (Ward 38)</option>
+              <option value="102">Shivajinagar (Ward 12)</option>
+              <option value="103">Hadapsar (Ward 42)</option>
+              <option value="104">Aundh (Ward 35)</option>
+              <option value="105">Deccan (Ward 15)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title">Date Range</div>
+          <div class="form-group">
+            <label class="form-label">Analysis Period</label>
+            <select class="form-select" id="period-select" onchange="loadGridData()">
+              <option value="30">Last 30 Days</option>
+              <option value="60">Last 60 Days</option>
+              <option value="90" selected>Last 90 Days</option>
+              <option value="180">Last 6 Months</option>
+              <option value="365">Last Year</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title">Actions</div>
+          <button class="btn" onclick="refreshData()">Refresh Data</button>
+          <button class="btn btn-secondary" style="margin-top:10px" onclick="exportReport()">Export Audit
+            Report</button>
+        </div>
+
+        <div class="legend">
+          <div class="legend-title">Hotspot Status</div>
+          <div class="legend-item">
+            <div class="legend-color" style="background:#10b981"></div><span>Stable</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background:#fbbf24"></div><span>Watchlist</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background:#f59e0b"></div><span>Emerging</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background:#ef4444"></div><span>Chronic</span>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <div class="map-container">
+          <div id="map"></div>
+          <div class="map-controls">
+            <label>Time Period</label>
+            <input type="range" class="time-slider" min="1" max="12" value="12" id="time-slider"
+              onchange="updateMapTime()">
+            <div style="text-align:center;font-size:0.85em;margin-top:6px;color:#64748b" id="time-label">Current</div>
+          </div>
+        </div>
+
+        <aside class="right-panel">
+          <div id="grid-info"></div>
+
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-label">Accuracy</div>
+              <div class="stat-value" id="stat-accuracy">82%</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Avg Response</div>
+              <div class="stat-value" id="stat-response">18m</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Overflows</div>
+              <div class="stat-value" id="stat-overflow">8</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Complaints</div>
+              <div class="stat-value" id="stat-complaints">35</div>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-container">
+              <div class="chart-title">Prediction Accuracy Trend</div>
+              <canvas id="accuracy-chart" class="chart-canvas"></canvas>
+            </div>
+
+            <div class="chart-container">
+              <div class="chart-title">Response Time Analysis</div>
+              <canvas id="response-chart" class="chart-canvas"></canvas>
+            </div>
+
+            <div class="chart-container">
+              <div class="chart-title">Complaint Density Trend</div>
+              <canvas id="complaint-chart" class="chart-canvas"></canvas>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map, hotspotLayer;
+    let charts = {};
+    const puneHotspots = [
+      { id: 101, name: 'Kothrud', lat: 18.5074, lon: 73.8077, status: 'emerging', score: 0.72 },
+      { id: 102, name: 'Shivajinagar', lat: 18.5304, lon: 73.8503, status: 'emerging', score: 0.68 },
+      { id: 103, name: 'Hadapsar', lat: 18.5089, lon: 73.9260, status: 'watchlist', score: 0.55 },
+      { id: 104, name: 'Aundh', lat: 18.5590, lon: 73.8078, status: 'watchlist', score: 0.48 },
+      { id: 105, name: 'Deccan', lat: 18.5165, lon: 73.8442, status: 'watchlist', score: 0.52 },
+      { id: 106, name: 'Pimpri', lat: 18.6298, lon: 73.7997, status: 'stable', score: 0.25 },
+      { id: 107, name: 'Wakad', lat: 18.5978, lon: 73.7644, status: 'stable', score: 0.30 },
+      { id: 108, name: 'Baner', lat: 18.5590, lon: 73.7810, status: 'watchlist', score: 0.42 }
+    ];
+
+    function initMap() {
+      map = L.map('map').setView([18.5204, 73.8567], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      updateHotspotLayer();
+    }
+
+    function updateHotspotLayer() {
+      if (hotspotLayer) map.removeLayer(hotspotLayer);
+      const markers = puneHotspots.map(h => {
+        const colors = { stable: '#10b981', watchlist: '#fbbf24', emerging: '#f59e0b', chronic: '#ef4444' };
+        const color = colors[h.status];
+        const marker = L.circleMarker([h.lat, h.lon], { radius: 12, fillColor: color, color: 'white', weight: 2, fillOpacity: 0.7 });
+        marker.bindPopup(`<div style="font-family:Arial;min-width:180px"><strong style="color:${color};font-size:1.1em">${h.name}</strong><div style="margin:8px 0"><span class="status-badge status-${h.status}">${h.status}</span></div><div style="font-size:0.9em">Hotspot Score: <strong>${h.score}</strong></div></div>`);
+        marker.on('click', () => selectGrid(h.id));
+        return marker;
+      });
+      hotspotLayer = L.layerGroup(markers).addTo(map);
+    }
+
+    function updateMapTime() {
+      const val = document.getElementById('time-slider').value;
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const label = val == 12 ? 'Current' : `${months[12 - val]} 2024`;
+      document.getElementById('time-label').textContent = label;
+    }
+
+    function selectGrid(gridId) {
+      document.getElementById('grid-select').value = gridId;
+      loadGridData();
+    }
+
+    async function loadGridData() {
+      const gridId = document.getElementById('grid-select').value;
+      const days = document.getElementById('period-select').value;
+      document.getElementById('loading').style.display = 'flex';
+      try {
+        const [evolution, accuracy, hotspots] = await Promise.all([
+          fetch(`/api/risk-memory/risk-evolution/${gridId}?days=${days}`).then(r => r.json()),
+          fetch(`/api/risk-memory/prediction-accuracy?days=${days}`).then(r => r.json()),
+          fetch('/api/risk-memory/hotspots').then(r => r.json())
+        ]);
+        updateGridInfo(evolution.evolution);
+        updateCharts(evolution.evolution);
+        updateStats(evolution.evolution);
+      } catch (e) {
+        console.error('Error loading data:', e);
+        alert('Error loading data: ' + e.message);
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function updateGridInfo(data) {
+      const statusClass = 'status-' + data.current_status;
+      const html = `
+<div class="grid-info">
+<h3>${data.ward_name} (Grid ${data.grid_id})</h3>
+<p><strong>Status:</strong> <span class="status-badge ${statusClass}">${data.current_status}</span></p>
+<p><strong>Hotspot Score:</strong> ${data.current_hotspot_score}</p>
+<p><strong>Period:</strong> ${data.period_days} days</p>
+</div>
+`;
+      document.getElementById('grid-info').innerHTML = html;
+    }
+
+    function updateStats(data) {
+      const lastAccuracy = data.trends.prediction_accuracy[data.trends.prediction_accuracy.length - 1];
+      document.getElementById('stat-accuracy').textContent = (lastAccuracy.accuracy * 100).toFixed(0) + '%';
+      document.getElementById('stat-response').textContent = '18m';
+      const totalOverflow = data.trends.overflow_events.reduce((sum, e) => sum + e.count, 0);
+      document.getElementById('stat-overflow').textContent = totalOverflow;
+      const lastComplaint = data.trends.complaint_surge[data.trends.complaint_surge.length - 1];
+      document.getElementById('stat-complaints').textContent = lastComplaint.count;
+    }
+
+    function updateCharts(data) {
+      if (charts.accuracy) charts.accuracy.destroy();
+      if (charts.response) charts.response.destroy();
+      if (charts.complaint) charts.complaint.destroy();
+
+      const accuracyData = data.trends.prediction_accuracy;
+      charts.accuracy = new Chart(document.getElementById('accuracy-chart'), {
+        type: 'line',
+        data: {
+          labels: accuracyData.map(d => d.date.substring(5)),
+          datasets: [{
+            label: 'Accuracy',
+            data: accuracyData.map(d => d.accuracy * 100),
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      const overflowData = data.trends.overflow_events;
+      charts.response = new Chart(document.getElementById('response-chart'), {
+        type: 'bar',
+        data: {
+          labels: overflowData.map(d => d.date.substring(5)),
+          datasets: [{
+            label: 'Events',
+            data: overflowData.map(d => d.count),
+            backgroundColor: '#f59e0b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      const complaintData = data.trends.complaint_surge;
+      charts.complaint = new Chart(document.getElementById('complaint-chart'), {
+        type: 'line',
+        data: {
+          labels: complaintData.map(d => d.date.substring(5)),
+          datasets: [{
+            label: 'Complaints',
+            data: complaintData.map(d => d.count),
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239,68,68,0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    async function refreshData() {
+      await loadGridData();
+    }
+
+    async function exportReport() {
+      const gridId = document.getElementById('grid-select').value;
+      try {
+        const response = await fetch(`/api/risk-memory/audit-report/${gridId}`);
+        const data = await response.json();
+        const report = data.audit_report;
+        const csv = `Grid ID,${report.grid_id}
+Ward Name,${report.ward_name}
+Report Period,${report.report_period}
+Total Predictions,${report.total_predictions}
+Prediction Accuracy,${report.prediction_accuracy}%
+Avg Response Time,${report.response_metrics.avg_response_time} min
+Hotspot Status,${report.hotspot_analysis.current_status}
+Hotspot Score,${report.hotspot_analysis.hotspot_score}
+Recommendation,"${report.hotspot_analysis.recommendation}"
+Generated,${report.audit_timestamp}`;
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `risk_audit_grid_${gridId}_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+      } catch (e) {
+        alert('Error exporting report: ' + e.message);
+      }
+    }
+
+    initMap();
+    loadGridData();
+  </script>
+</body>
+
+</html>
