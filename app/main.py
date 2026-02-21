@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.database import init_db
-from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid
+from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid, hrvc_risk, risk, usps, liquid_galaxy, drainage, decision
 import logging
 import os
 
@@ -44,6 +44,12 @@ app.include_router(sample_data.router)
 app.include_router(synthetic_grid.router)
 app.include_router(realtime.router)
 app.include_router(demo_grid.router)
+app.include_router(hrvc_risk.router)
+app.include_router(risk.router)
+app.include_router(usps.router)
+app.include_router(liquid_galaxy.router)
+app.include_router(drainage.router)
+app.include_router(decision.router)
 if PRODUCTION_GRID_AVAILABLE:
     app.include_router(production_grid.router)
     logger.info("Production grid generation enabled")
@@ -57,7 +63,12 @@ async def startup_event():
 
 @app.get("/")
 def root():
-    """Serve the main UI"""
+    """Serve the PuneRakshak homepage"""
+    homepage = os.path.join(os.path.dirname(__file__), "static", "punerakshak.html")
+    if os.path.exists(homepage):
+        return FileResponse(homepage)
+    
+    # Fallback to old index
     static_file = os.path.join(os.path.dirname(__file__), "static", "index.html")
     if os.path.exists(static_file):
         return FileResponse(static_file)

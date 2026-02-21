@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerts Dashboard - PuneRakshak</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .header {
+      background: #1e40af;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #1e3a8a
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1
+    }
+
+    .page-header {
+      margin-bottom: 24px
+    }
+
+    .page-title {
+      font-size: 2em;
+      color: #1e293b;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .page-subtitle {
+      font-size: 1em;
+      color: #64748b
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .stat-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-left: 4px solid #3b82f6
+    }
+
+    .stat-box.critical {
+      border-left-color: #dc2626
+    }
+
+    .stat-box.warning {
+      border-left-color: #f59e0b
+    }
+
+    .stat-box.info {
+      border-left-color: #10b981
+    }
+
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1
+    }
+
+    .stat-label {
+      font-size: 0.85em;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-top: 8px;
+      letter-spacing: 0.5px
+    }
+
+    .filters {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .filter-label {
+      font-size: 0.9em;
+      font-weight: 600;
+      color: #475569
+    }
+
+    .filter-select {
+      padding: 8px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9em;
+      background: white;
+      cursor: pointer
+    }
+
+    .alerts-table {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    thead {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white
+    }
+
+    th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9em
+    }
+
+    tr:hover {
+      background: #f8fafc
+    }
+
+    .alert-id {
+      font-weight: 700;
+      color: #2563eb
+    }
+
+    .severity-badge {
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-block
+    }
+
+    .severity-critical {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .severity-high {
+      background: #fed7aa;
+      color: #9a3412
+    }
+
+    .severity-warning {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .severity-low {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .status-badge-table {
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 600;
+      display: inline-block
+    }
+
+    .status-active {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .status-resolved {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .action-btn {
+      padding: 6px 14px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .action-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px)
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal.active {
+      display: flex
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3)
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      padding: 18px 20px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .modal-title {
+      font-size: 1.3em;
+      font-weight: 700
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.4em;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-body {
+      padding: 24px
+    }
+
+    .detail-section {
+      margin-bottom: 20px
+    }
+
+    .detail-title {
+      font-size: 1em;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    .detail-item {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 6px
+    }
+
+    .detail-label {
+      font-size: 0.75em;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .detail-value {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .message-box {
+      background: #eff6ff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #bfdbfe;
+      margin-bottom: 16px
+    }
+
+    .message-text {
+      font-size: 0.95em;
+      line-height: 1.6;
+      color: #334155
+    }
+
+    .message-marathi {
+      background: white;
+      padding: 14px;
+      border-radius: 6px;
+      border-left: 3px solid #f59e0b;
+      margin-top: 12px
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Dashboard</a>
+      <a href="/static/alerts.html" class="nav-btn active">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#3b82f6;margin-left:8px">
+        <span id="time">08:10 pm</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">🚨 Alerts Dashboard</h1>
+      <p class="page-subtitle">Real-time monitoring of critical system alerts across Pune</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-box critical">
+        <div class="stat-number" id="stat-total">-</div>
+        <div class="stat-label">Total Alerts</div>
+      </div>
+      <div class="stat-box critical">
+        <div class="stat-number" id="stat-critical">-</div>
+        <div class="stat-label">Critical</div>
+      </div>
+      <div class="stat-box warning">
+        <div class="stat-number" id="stat-warning">-</div>
+        <div class="stat-label">Warning</div>
+      </div>
+      <div class="stat-box info">
+        <div class="stat-number" id="stat-resolved">-</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <span class="filter-label">Filter by:</span>
+      <select class="filter-select" id="filter-severity">
+        <option value="all">All Severities</option>
+        <option value="EMERGENCY">Emergency</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="WARNING">Warning</option>
+      </select>
+      <select class="filter-select" id="filter-status">
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <button class="action-btn" onclick="loadAlerts()" style="margin-left:auto">🔄 Refresh</button>
+    </div>
+
+    <div class="alerts-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Alert ID</th>
+            <th>Zone / Ward</th>
+            <th>Severity</th>
+            <th>USPS Score</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="alerts-tbody">
+          <tr>
+            <td colspan="7" style="text-align:center;padding:40px;color:#64748b">Loading alerts...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Alert Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <div class="detail-title">Alert Information</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Alert ID</div>
+              <div class="detail-value" id="detail-id">-</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Ward / Zone</div>
+              <div class="detail-value" id="detail-ward">-</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Severity Level</div>
+              <div class="detail-value" id="detail-severity">-</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">USPS Score</div>
+              <div class="detail-value" id="detail-usps">-</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Systems at Risk</div>
+              <div class="detail-value" id="detail-systems">-</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Timestamp</div>
+              <div class="detail-value" id="detail-time">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-title">Generated Alert Message</div>
+          <div class="message-box">
+            <div class="message-text" id="message-en">Loading message...</div>
+            <div class="message-marathi">
+              <strong style="color:#b45309">मराठी संदेश:</strong>
+              <div id="message-mr" style="margin-top:8px;color:#334155">संदेश तयार करत आहे...</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button class="action-btn" onclick="generateAlertMessage()">🔄 Regenerate Message</button>
+          <button class="action-btn" style="background:#10b981" onclick="markResolved()">✓ Mark Resolved</button>
+          <button class="action-btn" style="background:#64748b" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let alertsData = [];
+    let selectedAlert = null;
+
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    async function loadAlerts() {
+      document.getElementById('loading').style.display = 'flex';
+      try {
+        const params = 'lat_min=18.45&lat_max=18.60&lon_min=73.75&lon_max=73.95';
+        const res = await fetch(`/api/usps/cascade-warnings?${params}`);
+        const data = await res.json();
+
+        alertsData = data.cascade_cells.map((cell, idx) => ({
+          id: `ALT-${String(idx + 1).padStart(4, '0')}`,
+          cell_id: cell.cell_id,
+          ward: cell.ward_name,
+          severity: cell.cascade_analysis.cascade_level,
+          usps: cell.usps_score,
+          systems: cell.cascade_analysis.systems_at_risk,
+          timestamp: new Date().toISOString(),
+          status: 'active',
+          subsystems: cell.subsystem_pressures
+        }));
+
+        updateStats(data);
+        renderAlerts();
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('alerts-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626">Failed to load alerts</td></tr>';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function updateStats(data) {
+      document.getElementById('stat-total').textContent = data.total_warnings;
+      document.getElementById('stat-critical').textContent = data.summary.emergency + data.summary.critical;
+      document.getElementById('stat-warning').textContent = data.summary.warning;
+      document.getElementById('stat-resolved').textContent = '0';
+    }
+
+    function renderAlerts() {
+      const tbody = document.getElementById('alerts-tbody');
+
+      if (!alertsData.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#10b981">✅ No active alerts</td></tr>';
+        return;
+      }
+
+      const html = alertsData.map(alert => {
+        const severityClass = alert.severity === 'EMERGENCY' || alert.severity === 'CRITICAL' ? 'severity-critical' : alert.severity === 'WARNING' ? 'severity-warning' : 'severity-low';
+        const statusClass = alert.status === 'active' ? 'status-active' : 'status-resolved';
+        const time = new Date(alert.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'short', timeStyle: 'short' });
+
+        return `<tr>
+          <td><span class="alert-id">${alert.id}</span></td>
+          <td>${alert.ward}</td>
+          <td><span class="severity-badge ${severityClass}">${alert.severity}</span></td>
+          <td><strong>${alert.usps.toFixed(1)}</strong></td>
+          <td>${time}</td>
+          <td><span class="status-badge-table ${statusClass}">${alert.status.toUpperCase()}</span></td>
+          <td><button class="action-btn" onclick="viewDetails('${alert.id}')">View Details</button></td>
+        </tr>`;
+      }).join('');
+
+      tbody.innerHTML = html;
+    }
+
+    function viewDetails(alertId) {
+      selectedAlert = alertsData.find(a => a.id === alertId);
+      if (!selectedAlert) return;
+
+      document.getElementById('modal-title').textContent = `Alert ${alertId}`;
+      document.getElementById('detail-id').textContent = alertId;
+      document.getElementById('detail-ward').textContent = selectedAlert.ward;
+      document.getElementById('detail-severity').textContent = selectedAlert.severity;
+      document.getElementById('detail-usps').textContent = selectedAlert.usps.toFixed(1);
+      document.getElementById('detail-systems').textContent = selectedAlert.systems;
+      document.getElementById('detail-time').textContent = new Date(selectedAlert.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+      generateAlertMessage();
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function generateAlertMessage() {
+      if (!selectedAlert) return;
+
+      const severity = selectedAlert.severity;
+      const ward = selectedAlert.ward;
+      const usps = selectedAlert.usps.toFixed(1);
+      const systems = selectedAlert.systems;
+
+      let messageEn = '';
+      let messageMr = '';
+
+      if (severity === 'EMERGENCY' || severity === 'CRITICAL') {
+        messageEn = `CRITICAL ALERT: High system pressure detected in ${ward} (USPS: ${usps}). ${systems} urban systems are experiencing severe stress. Residents in low-lying areas should remain alert. Emergency response teams have been notified and are on standby. Avoid unnecessary travel and follow official advisories.`;
+        messageMr = `गंभीर सूचना: ${ward} मध्ये उच्च प्रणाली दबाव आढळला आहे (USPS: ${usps}). ${systems} शहरी प्रणाली गंभीर ताणाखाली आहेत. सखल भागातील रहिवाशांनी सतर्क राहावे. आपत्कालीन प्रतिसाद पथके सूचित केली गेली आहेत आणि तयार आहेत. अनावश्यक प्रवास टाळा आणि अधिकृत सल्ल्यांचे पालन करा.`;
+      } else if (severity === 'WARNING') {
+        messageEn = `WARNING: Elevated system pressure in ${ward} (USPS: ${usps}). ${systems} systems showing increased stress levels. Authorities are monitoring the situation closely. Citizens are advised to stay informed through official channels.`;
+        messageMr = `चेतावणी: ${ward} मध्ये वाढलेला प्रणाली दबाव (USPS: ${usps}). ${systems} प्रणाली वाढीव ताण पातळी दर्शवत आहेत. अधिकारी परिस्थितीचे बारकाईने निरीक्षण करत आहेत. नागरिकांना अधिकृत माध्यमांद्वारे माहिती मिळवण्याचा सल्ला दिला जातो.`;
+      } else {
+        messageEn = `ADVISORY: Moderate system pressure in ${ward} (USPS: ${usps}). ${systems} systems under observation. Situation is stable. Continue normal activities while staying aware of weather updates.`;
+        messageMr = `सल्ला: ${ward} मध्ये मध्यम प्रणाली दबाव (USPS: ${usps}). ${systems} प्रणाली निरीक्षणाखाली आहेत. परिस्थिती स्थिर आहे. हवामान अद्यतनांची जाणीव ठेवत सामान्य क्रियाकलाप सुरू ठेवा.`;
+      }
+
+      document.getElementById('message-en').textContent = messageEn;
+      document.getElementById('message-mr').textContent = messageMr;
+    }
+
+    function markResolved() {
+      if (selectedAlert) {
+        selectedAlert.status = 'resolved';
+        renderAlerts();
+        closeModal();
+        alert('Alert marked as resolved');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+    loadAlerts();
+    setInterval(loadAlerts, 300000);
+  </script>
+</body>
+
+</html>

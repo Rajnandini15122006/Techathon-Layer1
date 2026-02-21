@@ -330,6 +330,17 @@
       </div>
     </div>
     <div class="header-right">
+      <a href="/static/usps_dashboard.html" style="text-decoration: none;">
+        <div class="status-badge"
+          style="background: rgba(220, 38, 38, 0.2); cursor: pointer; color: #dc2626; border: 1px solid #dc2626;">
+          <span>🔴 USPS Monitor</span>
+        </div>
+      </a>
+      <a href="/static/risk_dashboard.html" style="text-decoration: none;">
+        <div class="status-badge" style="background: rgba(255, 255, 255, 0.3); cursor: pointer;">
+          <span>🟡 Risk Dashboard</span>
+        </div>
+      </a>
       <div class="status-badge">
         <div class="status-dot"></div>
         <span>System Active</span>
@@ -388,18 +399,22 @@
       <div class="panel">
         <h2>📍 Legend</h2>
         <div class="legend">
-          <h4>Flood Risk Levels</h4>
+          <h4>HRVC Risk Levels</h4>
           <div class="legend-item">
             <div class="legend-color" style="background: #10b981;"></div>
-            <span>Low Risk (&lt;0.5m)</span>
+            <span>Low Risk (&lt;25)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #f59e0b;"></div>
-            <span>Medium Risk (0.5-1.5m)</span>
+            <span>Medium Risk (25-50)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #ef4444;"></div>
-            <span>High Risk (&gt;1.5m)</span>
+            <span>High Risk (50-75)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #dc2626;"></div>
+            <span>Critical Risk (&gt;75)</span>
           </div>
         </div>
       </div>
@@ -465,11 +480,23 @@
           gridLayer = L.geoJSON(data, {
             style: function (feature) {
               const props = feature.properties;
-              const floodDepth = props.flood_depth_avg || 0;
+              const riskScore = props.risk_score;
 
-              let color = '#10b981'; // Low risk
-              if (floodDepth > 1.5) color = '#ef4444'; // High risk
-              else if (floodDepth > 0.5) color = '#f59e0b'; // Medium risk
+              // Color by risk score if available, otherwise by flood depth
+              let color = '#94a3b8'; // Default gray
+
+              if (riskScore !== null && riskScore !== undefined) {
+                if (riskScore >= 75) color = '#dc2626'; // Critical - dark red
+                else if (riskScore >= 50) color = '#ef4444'; // High - red
+                else if (riskScore >= 25) color = '#f59e0b'; // Medium - orange
+                else color = '#10b981'; // Low - green
+              } else {
+                // Fallback to flood depth
+                const floodDepth = props.flood_depth_avg || 0;
+                if (floodDepth > 1.5) color = '#ef4444';
+                else if (floodDepth > 0.5) color = '#f59e0b';
+                else color = '#10b981';
+              }
 
               return {
                 fillColor: color,
@@ -498,6 +525,16 @@
               const popup = `
                 <div style="font-family: Arial, sans-serif; min-width: 220px;">
                   <h3 style="margin: 0 0 12px 0; color: #1e40af; font-size: 15px; border-bottom: 2px solid #3b82f6; padding-bottom: 6px;">Grid Cell #${props.id}</h3>
+                  ${props.risk_score !== null && props.risk_score !== undefined ? `
+                  <div style="background: ${props.risk_level === 'Critical' ? '#fee2e2' : props.risk_level === 'High' ? '#fef3c7' : props.risk_level === 'Medium' ? '#dbeafe' : '#d1fae5'}; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center;">
+                    <strong style="color: ${props.risk_level === 'Critical' ? '#991b1b' : props.risk_level === 'High' ? '#92400e' : props.risk_level === 'Medium' ? '#1e40af' : '#065f46'};">Risk: ${props.risk_level} (${props.risk_score.toFixed(1)})</strong>
+                  </div>
+                  <table style="width: 100%; font-size: 11px; margin-bottom: 8px;">
+                    <tr><td><strong>Hazard:</strong></td><td style="text-align: right;">${props.hazard_score?.toFixed(1) || 'N/A'}</td></tr>
+                    <tr><td><strong>Vulnerability:</strong></td><td style="text-align: right;">${props.vulnerability_score?.toFixed(1) || 'N/A'}</td></tr>
+                    <tr><td><strong>Capacity:</strong></td><td style="text-align: right;">${props.capacity_score?.toFixed(1) || 'N/A'}</td></tr>
+                  </table>
+                  ` : ''}
                   <table style="width: 100%; font-size: 12px;">
                     <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Elevation:</strong></td><td style="text-align: right;">${props.elevation_mean?.toFixed(1) || 'N/A'} m</td></tr>
                     <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Drain Distance:</strong></td><td style="text-align: right;">${(props.drain_distance / 1000)?.toFixed(2) || 'N/A'} km</td></tr>

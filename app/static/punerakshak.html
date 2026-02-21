@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PuneRakshak - Disaster Risk Assessment & Monitoring System</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #2c3e50;
+      height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .header {
+      background: #1e40af;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #1e3a8a
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden
+    }
+
+    .sidebar {
+      width: 200px;
+      background: white;
+      box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+      overflow-y: auto;
+      padding: 14px
+    }
+
+    .sidebar-section {
+      margin-bottom: 18px
+    }
+
+    .section-title {
+      font-size: 0.7em;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 12px 8px;
+      border-radius: 6px;
+      text-align: center
+    }
+
+    .stat-value {
+      font-size: 1.6em;
+      font-weight: 700;
+      line-height: 1
+    }
+
+    .stat-label {
+      font-size: 0.6em;
+      text-transform: uppercase;
+      margin-top: 4px;
+      opacity: 0.95;
+      letter-spacing: 0.3px
+    }
+
+    .weather-card {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px
+    }
+
+    .weather-title {
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-bottom: 8px
+    }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px
+    }
+
+    .weather-item {
+      text-align: center
+    }
+
+    .weather-value {
+      font-size: 1.2em;
+      font-weight: 700
+    }
+
+    .weather-label {
+      font-size: 0.6em;
+      opacity: 0.95
+    }
+
+    .risk-list {
+      list-style: none
+    }
+
+    .risk-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px;
+      margin-bottom: 5px;
+      background: #f8fafc;
+      border-radius: 5px;
+      font-size: 0.75em;
+      align-items: center
+    }
+
+    .risk-badge {
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7em;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .risk-low {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .map-container {
+      flex: 1;
+      position: relative;
+      background: #e5e7eb
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .popup-content {
+      font-family: Arial, sans-serif;
+      font-size: 0.85em
+    }
+
+    .popup-title {
+      font-size: 1em;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0
+    }
+
+    .popup-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #f1f5f9
+    }
+
+    .popup-label {
+      color: #64748b;
+      font-weight: 600
+    }
+
+    .popup-value {
+      color: #1e293b;
+      font-weight: 700
+    }
+
+    .popup-value.highlight {
+      color: #f59e0b
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal.active {
+      display: flex
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      max-width: 650px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3)
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .modal-title {
+      font-size: 1.2em;
+      font-weight: 700
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.4em;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-body {
+      padding: 20px
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px
+    }
+
+    .detail-item {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid #3b82f6
+    }
+
+    .detail-label {
+      font-size: 0.7em;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .detail-value {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .subsystem-bars {
+      margin-bottom: 20px
+    }
+
+    .subsystem-item {
+      margin-bottom: 12px
+    }
+
+    .subsystem-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.85em
+    }
+
+    .subsystem-name {
+      font-weight: 600;
+      color: #334155
+    }
+
+    .subsystem-value {
+      font-weight: 700;
+      color: #2563eb
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.5s;
+      border-radius: 4px
+    }
+
+    .message-section {
+      background: #eff6ff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #bfdbfe
+    }
+
+    .message-title {
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 10px
+    }
+
+    .message-text {
+      font-size: 0.9em;
+      line-height: 1.6;
+      color: #334155;
+      margin-bottom: 10px
+    }
+
+    .message-marathi {
+      background: white;
+      padding: 14px;
+      border-radius: 6px;
+      border-left: 3px solid #f59e0b;
+      margin-top: 10px
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3)
+    }
+
+    .btn-secondary {
+      background: #64748b;
+      color: white
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/punerakshak.html" class="nav-btn active">Risk Dashboard</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#3b82f6;margin-left:8px">
+        <span id="time">08:10 pm</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">📊 Coverage Statistics</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-cells">-</div>
+            <div class="stat-label">GRID CELLS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">250m</div>
+            <div class="stat-label">RESOLUTION</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">603.8</div>
+            <div class="stat-label">AREA (KM²)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">Pune</div>
+            <div class="stat-label">CITY</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">🌤️ Real-time Weather</div>
+        <div class="weather-card">
+          <div class="weather-title">Current Conditions - Pune</div>
+          <div class="weather-grid">
+            <div class="weather-item">
+              <div class="weather-value">28.5°C</div>
+              <div class="weather-label">Temperature</div>
+            </div>
+            <div class="weather-item">
+              <div class="weather-value">65%</div>
+              <div class="weather-label">Humidity</div>
+            </div>
+            <div class="weather-item">
+              <div class="weather-value">3.5</div>
+              <div class="weather-label">Wind Speed</div>
+            </div>
+            <div class="weather-item">
+              <div class="weather-value">0</div>
+              <div class="weather-label">Rainfall mm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">⚠️ Risk Assessment</div>
+        <ul class="risk-list">
+          <li class="risk-item">
+            <span>Flood Risk (Now)</span>
+            <span class="risk-badge risk-low">Low</span>
+          </li>
+          <li class="risk-item">
+            <span>Flood Risk (24h)</span>
+            <span class="risk-badge risk-low">Low</span>
+          </li>
+          <li class="risk-item">
+            <span>Heat Risk</span>
+            <span class="risk-badge risk-low">Low</span>
+          </li>
+          <li class="risk-item">
+            <span>Storm Risk</span>
+            <span class="risk-badge risk-low">Low</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Grid Cell Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Cell ID</div>
+            <div class="detail-value" id="detail-cell-id">-</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Ward Name</div>
+            <div class="detail-value" id="detail-ward">-</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">USPS Score</div>
+            <div class="detail-value" id="detail-usps">-</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Cascade Level</div>
+            <div class="detail-value" id="detail-cascade">-</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Population</div>
+            <div class="detail-value" id="detail-pop">-</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Systems at Risk</div>
+            <div class="detail-value" id="detail-systems">-</div>
+          </div>
+        </div>
+
+        <div class="subsystem-bars">
+          <h4 style="margin-bottom:14px;color:#2563eb;font-size:0.95em">Subsystem Pressures</h4>
+          <div id="subsystem-list"></div>
+        </div>
+
+        <div class="message-section">
+          <div class="message-title">🚨 Generated Alert Message</div>
+          <div class="message-text" id="alert-message-en">Loading alert message...</div>
+          <div class="message-marathi">
+            <strong style="color:#b45309">मराठी संदेश:</strong>
+            <div id="alert-message-mr" style="margin-top:8px;color:#334155">संदेश तयार करत आहे...</div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="generateMessage()">🔄 Regenerate Message</button>
+          <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map, gridLayer, currentData, selectedCell;
+
+    function initMap() {
+      map = L.map('map', {
+        center: [18.5204, 73.8567],
+        zoom: 12
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(map);
+    }
+
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    async function loadData() {
+      document.getElementById('loading').style.display = 'flex';
+      try {
+        const params = 'lat_min=18.45&lat_max=18.60&lon_min=73.75&lon_max=73.95';
+        const res = await fetch(`/api/usps/calculate?${params}`);
+        currentData = await res.json();
+
+        document.getElementById('stat-cells').textContent = currentData.total_cells;
+
+        renderGridCells(currentData.grid_cells);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load data');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function renderGridCells(cells) {
+      if (gridLayer) map.removeLayer(gridLayer);
+
+      // Calculate proper grid cell size (half size to avoid overlap)
+      const gridSize = 0.0045; // Half of 0.009 to prevent overlap
+
+      const features = cells.map(cell => {
+        const color = getColorForUSPS(cell.usps_score);
+
+        // Create non-overlapping cells
+        const bounds = [
+          [cell.latitude - gridSize, cell.longitude - gridSize],
+          [cell.latitude + gridSize, cell.longitude + gridSize]
+        ];
+
+        const rect = L.rectangle(bounds, {
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.3, // Light but visible
+          weight: 0.5, // Thin border
+          opacity: 0.4
+        });
+
+        // Popup on click
+        const popupContent = `
+          <div class="popup-content">
+            <div class="popup-title">Grid Cell #${cell.cell_id}</div>
+            <div class="popup-row">
+              <span class="popup-label">Elevation:</span>
+              <span class="popup-value">609.3 m</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Drain Distance:</span>
+              <span class="popup-value">3.86 km</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Land Use:</span>
+              <span class="popup-value">Mixed</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Population:</span>
+              <span class="popup-value">${cell.population || 228}</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Slum Density:</span>
+              <span class="popup-value">0.0%</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Flood Depth:</span>
+              <span class="popup-value highlight">0.00 m</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Infrastructure:</span>
+              <span class="popup-value">0 facilities</span>
+            </div>
+            <div class="popup-row">
+              <span class="popup-label">Complaints:</span>
+              <span class="popup-value">6.2/km²</span>
+            </div>
+          </div>
+        `;
+
+        rect.bindPopup(popupContent, {
+          maxWidth: 300,
+          className: 'custom-popup'
+        });
+
+        rect.on('click', () => showDetails(cell));
+        return rect;
+      });
+
+      gridLayer = L.layerGroup(features).addTo(map);
+    }
+
+    function getColorForUSPS(score) {
+      // Pastel colors matching the reference
+      if (score >= 90) return '#ef4444';
+      if (score >= 70) return '#fb923c';
+      if (score >= 50) return '#fde047';
+      if (score >= 30) return '#86efac';
+      return '#7dd3fc';
+    }
+
+    function showDetails(cell) {
+      selectedCell = cell;
+      document.getElementById('modalTitle').textContent = `Grid Cell #${cell.cell_id}`;
+      document.getElementById('detail-cell-id').textContent = cell.cell_id;
+      document.getElementById('detail-ward').textContent = cell.ward_name;
+      document.getElementById('detail-usps').textContent = cell.usps_score.toFixed(1);
+      document.getElementById('detail-cascade').textContent = cell.cascade_analysis.cascade_level;
+      document.getElementById('detail-pop').textContent = cell.population || 'N/A';
+      document.getElementById('detail-systems').textContent = cell.cascade_analysis.systems_at_risk;
+
+      const subsystems = [
+        { key: 'rain_accumulation', name: 'Rain Accumulation', icon: '🌧️' },
+        { key: 'drain_capacity_load', name: 'Drain Capacity', icon: '🌊' },
+        { key: 'road_congestion', name: 'Road Congestion', icon: '🚗' },
+        { key: 'hospital_occupancy', name: 'Hospital Occupancy', icon: '🏥' },
+        { key: 'power_stress', name: 'Power Stress', icon: '⚡' }
+      ];
+
+      const html = subsystems.map(sub => {
+        const value = cell.subsystem_pressures[sub.key];
+        const color = value >= 80 ? '#ef4444' : value >= 60 ? '#fb923c' : value >= 40 ? '#fde047' : '#86efac';
+        return `<div class="subsystem-item">
+          <div class="subsystem-header">
+            <span class="subsystem-name">${sub.icon} ${sub.name}</span>
+            <span class="subsystem-value">${value.toFixed(1)}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${value}%;background:${color}"></div>
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('subsystem-list').innerHTML = html;
+      generateMessage();
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function generateMessage() {
+      if (!selectedCell) return;
+
+      const severity = selectedCell.cascade_analysis.cascade_level;
+      const ward = selectedCell.ward_name;
+      const usps = selectedCell.usps_score.toFixed(1);
+      const systems = selectedCell.cascade_analysis.systems_at_risk;
+
+      let messageEn = '';
+      let messageMr = '';
+
+      if (severity === 'EMERGENCY' || severity === 'CRITICAL') {
+        messageEn = `CRITICAL ALERT: High system pressure detected in ${ward} (USPS: ${usps}). ${systems} urban systems are experiencing severe stress. Residents in low-lying areas should remain alert. Emergency response teams have been notified and are on standby. Avoid unnecessary travel and follow official advisories.`;
+        messageMr = `गंभीर सूचना: ${ward} मध्ये उच्च प्रणाली दबाव आढळला आहे (USPS: ${usps}). ${systems} शहरी प्रणाली गंभीर ताणाखाली आहेत. सखल भागातील रहिवाशांनी सतर्क राहावे. आपत्कालीन प्रतिसाद पथके सूचित केली गेली आहेत आणि तयार आहेत. अनावश्यक प्रवास टाळा आणि अधिकृत सल्ल्यांचे पालन करा.`;
+      } else if (severity === 'WARNING') {
+        messageEn = `WARNING: Elevated system pressure in ${ward} (USPS: ${usps}). ${systems} systems showing increased stress levels. Authorities are monitoring the situation closely. Citizens are advised to stay informed through official channels.`;
+        messageMr = `चेतावणी: ${ward} मध्ये वाढलेला प्रणाली दबाव (USPS: ${usps}). ${systems} प्रणाली वाढीव ताण पातळी दर्शवत आहेत. अधिकारी परिस्थितीचे बारकाईने निरीक्षण करत आहेत. नागरिकांना अधिकृत माध्यमांद्वारे माहिती मिळवण्याचा सल्ला दिला जातो.`;
+      } else {
+        messageEn = `ADVISORY: Moderate system pressure in ${ward} (USPS: ${usps}). ${systems} systems under observation. Situation is stable. Continue normal activities while staying aware of weather updates.`;
+        messageMr = `सल्ला: ${ward} मध्ये मध्यम प्रणाली दबाव (USPS: ${usps}). ${systems} प्रणाली निरीक्षणाखाली आहेत. परिस्थिती स्थिर आहे. हवामान अद्यतनांची जाणीव ठेवत सामान्य क्रियाकलाप सुरू ठेवा.`;
+      }
+
+      document.getElementById('alert-message-en').textContent = messageEn;
+      document.getElementById('alert-message-mr').textContent = messageMr;
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    initMap();
+    loadData();
+    updateTime();
+    setInterval(updateTime, 1000);
+    setInterval(loadData, 300000);
+  </script>
+</body>
+
+</html>

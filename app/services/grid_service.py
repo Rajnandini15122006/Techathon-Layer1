@@ -49,6 +49,11 @@ class GridService:
                         'flood_depth_avg', flood_depth_avg,
                         'infra_count', infra_count,
                         'complaint_density', complaint_density,
+                        'hazard_score', hazard_score,
+                        'vulnerability_score', vulnerability_score,
+                        'capacity_score', capacity_score,
+                        'risk_score', risk_score,
+                        'risk_level', risk_level,
                         'created_at', created_at
                     )
                 ) as feature

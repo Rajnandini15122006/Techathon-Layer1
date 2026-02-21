@@ -408,8 +408,75 @@ class SyntheticDataGenerator:
         self.grid_gdf['infra_count'] = infra_counts
         self.grid_gdf['complaint_density'] = complaint_densities
         
+        # Add HRVC risk engine fields
+        self._add_risk_fields(elevations, drain_distances, pop_densities, slum_densities, infra_counts)
+        
         logger.info("=" * 80)
         logger.info("SYNTHETIC DATA GENERATION COMPLETE")
         logger.info("=" * 80)
         
         return self.grid_gdf
+    
+    def _add_risk_fields(self, elevations, drain_distances, pop_densities, slum_densities, infra_counts):
+        """Add fields required for HRVC risk calculation"""
+        logger.info("Generating HRVC risk fields...")
+        
+        # HAZARD fields
+        # Rainfall forecast (mm) - higher in monsoon-prone areas
+        rainfall = np.random.uniform(50, 200, len(self.grid_gdf))
+        
+        # River level (m) - higher near drains
+        river_level = 10 * (1 - drain_distances / drain_distances.max()) * np.random.uniform(0.5, 1.5, len(self.grid_gdf))
+        
+        # Soil saturation (%) - higher in low elevation areas
+        soil_saturation = ((elevations.max() - elevations) / (elevations.max() - elevations.min())) * 100
+        soil_saturation = np.clip(soil_saturation * np.random.uniform(0.7, 1.3, len(self.grid_gdf)), 0, 100)
+        
+        # EXPOSURE fields
+        # Population density already exists, convert to per km²
+        population_density_km2 = pop_densities * 1_000_000  # Convert from per m² to per km²
+        
+        # Traffic density (vehicles/hour) - correlates with population
+        traffic_density = population_density_km2 * np.random.uniform(0.01, 0.03, len(self.grid_gdf))
+        
+        # VULNERABILITY fields
+        # Slum percentage already exists as slum_density
+        slum_percentage = slum_densities
+        
+        # Elderly percentage (% of population)
+        elderly_percentage = np.random.uniform(8, 18, len(self.grid_gdf))
+        
+        # Low elevation percentage (% of cell below flood threshold)
+        low_elevation_pct = np.clip((600 - elevations) / 100 * 50, 0, 100)
+        
+        # CAPACITY fields
+        # Shelter count - based on infrastructure
+        shelter_count = np.random.poisson(infra_counts * 0.3)
+        
+        # Hospital beds - based on infrastructure
+        hospital_beds = infra_counts * np.random.randint(20, 100, len(self.grid_gdf))
+        
+        # Drain strength (0-100 score) - better in urban areas, worse near rivers
+        drain_strength = 100 * (drain_distances / drain_distances.max()) * np.random.uniform(0.6, 1.0, len(self.grid_gdf))
+        drain_strength = np.clip(drain_strength, 10, 100)
+        
+        # Add ward IDs for aggregation
+        ward_ids = (np.arange(len(self.grid_gdf)) // 10) + 1  # Group cells into wards
+        ward_names = [f"Ward {wid}" for wid in ward_ids]
+        
+        # Add all fields to grid
+        self.grid_gdf['rainfall_mm'] = rainfall
+        self.grid_gdf['river_level_m'] = river_level
+        self.grid_gdf['soil_saturation_pct'] = soil_saturation
+        self.grid_gdf['population_density'] = population_density_km2
+        self.grid_gdf['traffic_density'] = traffic_density
+        self.grid_gdf['slum_percentage'] = slum_percentage
+        self.grid_gdf['elderly_percentage'] = elderly_percentage
+        self.grid_gdf['low_elevation_percentage'] = low_elevation_pct
+        self.grid_gdf['shelter_count'] = shelter_count
+        self.grid_gdf['hospital_beds'] = hospital_beds
+        self.grid_gdf['drain_strength'] = drain_strength
+        self.grid_gdf['ward_id'] = ward_ids
+        self.grid_gdf['ward_name'] = ward_names
+        
+        logger.info("HRVC risk fields added successfully")

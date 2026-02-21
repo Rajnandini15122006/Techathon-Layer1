@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USPS Monitor - PuneRakshak</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f0;
+      color: #1e3a5f;
+      height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .header {
+      background: #1e3a5f;
+      color: #f5f5f0;
+      padding: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border-bottom: 3px solid #152a45
+    }
+
+    .logo-section {
+      padding: 14px 28px;
+      background: rgba(245, 245, 240, 0.05);
+      border-bottom: 1px solid rgba(245, 245, 240, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+      color: #f5f5f0
+    }
+
+    .brand p {
+      font-size: 0.8em;
+      opacity: 0.9;
+      color: #d4d4c8
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 28px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(245, 245, 240, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(245, 245, 240, 0.1);
+      color: #f5f5f0;
+      border-bottom-color: rgba(245, 245, 240, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(245, 245, 240, 0.15);
+      color: #f5f5f0;
+      border-bottom-color: #f5f5f0
+    }
+
+    .status-badge {
+      background: #2d5f3f;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto;
+      color: #f5f5f0
+    }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 380px;
+      gap: 0;
+      overflow: hidden
+    }
+
+    .sidebar {
+      background: #f5f5f0;
+      border-right: 2px solid #d4d4c8;
+      overflow-y: auto;
+      padding: 20px
+    }
+
+    .section-title {
+      font-size: 0.75em;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 2px solid #1e3a5f;
+      padding-bottom: 6px
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px
+    }
+
+    .metric-card {
+      background: #1e3a5f;
+      color: #f5f5f0;
+      padding: 18px 14px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(30, 58, 95, 0.2)
+    }
+
+    .metric-value {
+      font-size: 2.2em;
+      font-weight: 800;
+      line-height: 1;
+      color: #f5f5f0
+    }
+
+    .metric-label {
+      font-size: 0.65em;
+      text-transform: uppercase;
+      margin-top: 8px;
+      opacity: 0.9;
+      color: #d4d4c8
+    }
+
+    .form-group {
+      margin-bottom: 16px
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #1e3a5f;
+      font-size: 0.85em;
+      font-weight: 600
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      border: 2px solid #d4d4c8;
+      border-radius: 6px;
+      font-size: 0.85em;
+      color: #1e3a5f
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px
+    }
+
+    .btn-primary {
+      background: #1e3a5f;
+      color: #f5f5f0
+    }
+
+    .btn-primary:hover {
+      background: #152a45;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3)
+    }
+
+    .btn-success {
+      background: #2d5f3f;
+      color: #f5f5f0
+    }
+
+    .btn-success:hover {
+      background: #234a31;
+      transform: translateY(-2px)
+    }
+
+    .subsys-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px
+    }
+
+    .subsys-item {
+      background: white;
+      padding: 14px;
+      border-radius: 8px;
+      border-left: 4px solid #1e3a5f;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)
+    }
+
+    .subsys-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.85em
+    }
+
+    .subsys-name {
+      font-weight: 600;
+      color: #1e3a5f
+    }
+
+    .subsys-value {
+      font-weight: 700;
+      color: #1e3a5f
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e8e8e0;
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.5s;
+      border-radius: 4px
+    }
+
+    .map-container {
+      position: relative;
+      background: #e8e8e0
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(245, 245, 240, 0.95);
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      border: 2px solid #1e3a5f
+    }
+
+    .legend-title {
+      font-size: 0.8em;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 10px;
+      text-transform: uppercase
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.75em;
+      color: #1e3a5f
+    }
+
+    .legend-circle {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+    }
+
+    .report-panel {
+      background: #f5f5f0;
+      border-left: 2px solid #d4d4c8;
+      overflow-y: auto;
+      padding: 20px
+    }
+
+    .report-section {
+      background: white;
+      padding: 18px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      border: 1px solid #d4d4c8
+    }
+
+    .report-title {
+      font-size: 1em;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1e3a5f
+    }
+
+    .report-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #e8e8e0;
+      font-size: 0.85em
+    }
+
+    .report-item:last-child {
+      border-bottom: none
+    }
+
+    .report-label {
+      color: #5a5a50;
+      font-weight: 600;
+      margin-bottom: 4px
+    }
+
+    .report-value {
+      color: #1e3a5f;
+      font-weight: 700
+    }
+
+    .recommendation-box {
+      background: #fff8e1;
+      padding: 14px;
+      border-radius: 6px;
+      border-left: 4px solid #f59e0b;
+      margin-bottom: 12px;
+      font-size: 0.85em;
+      line-height: 1.6;
+      color: #1e3a5f
+    }
+
+    .recommendation-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #b45309
+    }
+
+    .chart-container {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      border: 1px solid #d4d4c8
+    }
+
+    .chart-title {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 12px
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(245, 245, 240, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #d4d4c8;
+      border-top: 4px solid #1e3a5f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #e8e8e0
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 4px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Urban System Pressure Score (USPS) Monitor</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Dashboard</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn active">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1e3a5f;margin-left:8px">
+        <span id="time">08:10 pm</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <div style="margin-bottom:24px">
+        <div class="section-title">System Metrics</div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value" id="cells">-</div>
+            <div class="metric-label">Grid Cells</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="avg">-</div>
+            <div class="metric-label">Avg USPS</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="crit">-</div>
+            <div class="metric-label">Critical</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="casc">-</div>
+            <div class="metric-label">Cascades</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px">
+        <div class="section-title">Configuration</div>
+        <div class="form-group">
+          <label class="form-label">Visualization Mode</label>
+          <select id="mode" class="form-select">
+            <option value="usps">USPS Score</option>
+            <option value="cascade">Cascade Risk</option>
+            <option value="rain">Rain Accumulation</option>
+            <option value="drain">Drain Capacity</option>
+            <option value="road">Road Congestion</option>
+            <option value="hospital">Hospital Occupancy</option>
+            <option value="power">Power Stress</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="load()">Refresh Data</button>
+        <button class="btn btn-success" onclick="generateMonthlyReport()">Generate Monthly Report</button>
+      </div>
+
+      <div>
+        <div class="section-title">Subsystem Status</div>
+        <div class="subsys-list" id="subsys-list"></div>
+      </div>
+    </aside>
+
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="legend-title">Pressure Intensity</div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#8b0000"></div>
+          <span>Critical (90-100)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#dc2626"></div>
+          <span>Severe (75-89)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#f59e0b"></div>
+          <span>High (60-74)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#fbbf24"></div>
+          <span>Moderate (40-59)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#10b981"></div>
+          <span>Low (20-39)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-circle" style="background:#3b82f6"></div>
+          <span>Minimal (0-19)</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="report-panel">
+      <div class="section-title">Monthly Analysis Report</div>
+
+      <div class="chart-container">
+        <div class="chart-title">USPS Trend (30 Days)</div>
+        <canvas id="trendChart" height="120"></canvas>
+      </div>
+
+      <div class="report-section">
+        <div class="report-title">Infrastructure Recommendations</div>
+
+        <div class="recommendation-box">
+          <div class="recommendation-title">Priority 1: Drainage System</div>
+          Upgrade drainage capacity in Wards 4, 7, and 12. Current capacity at 78% average load. Recommend increasing
+          capacity by 30% to handle monsoon peaks.
+        </div>
+
+        <div class="recommendation-box">
+          <div class="recommendation-title">Priority 2: Road Network</div>
+          Implement traffic management system in high-congestion zones. Average congestion at 65% during peak hours.
+          Deploy smart traffic signals in 8 critical junctions.
+        </div>
+
+        <div class="recommendation-box">
+          <div class="recommendation-title">Priority 3: Hospital Capacity</div>
+          Increase emergency bed capacity by 20% in Wards 5 and 9. Current occupancy averaging 72%. Add 2 mobile medical
+          units for rapid response.
+        </div>
+
+        <div class="recommendation-box">
+          <div class="recommendation-title">Priority 4: Power Infrastructure</div>
+          Install backup power systems in critical zones. Power stress peaks at 68% during evening hours. Deploy 5
+          additional substations in high-demand areas.
+        </div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-title">Monthly Statistics</div>
+        <div class="report-item">
+          <div class="report-label">Total Alerts Generated</div>
+          <div class="report-value" id="monthly-alerts">-</div>
+        </div>
+        <div class="report-item">
+          <div class="report-label">Average USPS Score</div>
+          <div class="report-value" id="monthly-avg">-</div>
+        </div>
+        <div class="report-item">
+          <div class="report-label">Peak Pressure Day</div>
+          <div class="report-value" id="peak-day">-</div>
+        </div>
+        <div class="report-item">
+          <div class="report-label">Systems at Risk</div>
+          <div class="report-value" id="systems-risk">-</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    let map, scatterLayer, data, trendChart;
+
+    function initMap() {
+      map = L.map('map', {
+        center: [18.5204, 73.8567],
+        zoom: 12
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 18
+      }).addTo(map);
+    }
+
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }) + ' IST';
+    }
+
+    async function load() {
+      document.getElementById('loading').style.display = 'flex';
+      try {
+        const params = 'lat_min=18.45&lat_max=18.60&lon_min=73.75&lon_max=73.95';
+
+        const [r1, r2, r3] = await Promise.all([
+          fetch(`/api/usps/calculate?${params}`),
+          fetch(`/api/usps/cascade-warnings?${params}`),
+          fetch(`/api/usps/subsystem-status?${params}`)
+        ]);
+
+        data = {
+          usps: await r1.json(),
+          cascade: await r2.json(),
+          subsystem: await r3.json()
+        };
+
+        document.getElementById('cells').textContent = data.usps.total_cells;
+        document.getElementById('avg').textContent = data.usps.summary.avg_usps;
+        document.getElementById('crit').textContent = data.usps.summary.critical_cells;
+        document.getElementById('casc').textContent = data.cascade.total_warnings;
+
+        updateSubsys(data.subsystem.subsystem_status);
+        updateMonthlyStats();
+        render(data.usps.grid_cells);
+
+      } catch (e) {
+        console.error('Error:', e);
+        alert('Error loading data');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function updateSubsys(subsystems) {
+      const names = {
+        rain_accumulation: 'Rain Accumulation',
+        drain_capacity_load: 'Drain Capacity',
+        road_congestion: 'Road Congestion',
+        hospital_occupancy: 'Hospital Occupancy',
+        power_stress: 'Power Stress'
+      };
+
+      const html = Object.entries(subsystems).map(([key, value]) => {
+        const pressure = value.avg_pressure;
+        const color = pressure >= 80 ? '#8b0000' : pressure >= 60 ? '#f59e0b' : pressure >= 40 ? '#fbbf24' : '#10b981';
+        return `<div class="subsys-item">
+          <div class="subsys-header">
+            <span class="subsys-name">${names[key]}</span>
+            <span class="subsys-value">${pressure.toFixed(0)}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pressure}%;background:${color}"></div>
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('subsys-list').innerHTML = html;
+    }
+
+    function render(cells) {
+      if (scatterLayer) map.removeLayer(scatterLayer);
+
+      const mode = document.getElementById('mode').value;
+
+      // Create scatter plot with sized circles
+      const markers = cells.map(c => {
+        let value;
+        if (mode === 'usps') {
+          value = c.usps_score;
+        } else if (mode === 'cascade') {
+          value = (c.cascade_analysis.systems_at_risk / 5) * 100;
+        } else {
+          const modeMap = {
+            rain: 'rain_accumulation',
+            drain: 'drain_capacity_load',
+            road: 'road_congestion',
+            hospital: 'hospital_occupancy',
+            power: 'power_stress'
+          };
+          value = c.subsystem_pressures[modeMap[mode]];
+        }
+
+        const color = getColorForValue(value);
+        const radius = 4 + (value / 100) * 8; // Size based on value
+
+        const circle = L.circleMarker([c.latitude, c.longitude], {
+          radius: radius,
+          fillColor: color,
+          color: '#fff',
+          weight: 2,
+          opacity: 0.9,
+          fillOpacity: 0.7
+        });
+
+        circle.bindPopup(`
+          <div style="font-family:Arial;font-size:0.85em;color:#1e3a5f">
+            <strong>Cell ${c.cell_id} - ${c.ward_name}</strong><br>
+            USPS Score: <strong>${c.usps_score.toFixed(1)}</strong><br>
+            Systems at Risk: ${c.cascade_analysis.systems_at_risk}<br>
+            Cascade Level: ${c.cascade_analysis.cascade_level}
+          </div>
+        `);
+
+        return circle;
+      });
+
+      scatterLayer = L.layerGroup(markers).addTo(map);
+    }
+
+    function getColorForValue(value) {
+      if (value >= 90) return '#8b0000';
+      if (value >= 75) return '#dc2626';
+      if (value >= 60) return '#f59e0b';
+      if (value >= 40) return '#fbbf24';
+      if (value >= 20) return '#10b981';
+      return '#3b82f6';
+    }
+
+    function updateMonthlyStats() {
+      // Generate mock monthly data
+      const days = 30;
+      const labels = [];
+      const uspsData = [];
+
+      for (let i = days; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.getDate());
+        uspsData.push(Math.random() * 40 + 40); // Random between 40-80
+      }
+
+      // Update stats
+      document.getElementById('monthly-alerts').textContent = '247';
+      document.getElementById('monthly-avg').textContent = '62.4';
+      document.getElementById('peak-day').textContent = 'Feb 15, 2026';
+      document.getElementById('systems-risk').textContent = '3.2 avg';
+
+      // Create trend chart
+      if (trendChart) trendChart.destroy();
+
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'USPS Score',
+            data: uspsData,
+            borderColor: '#1e3a5f',
+            backgroundColor: 'rgba(30, 58, 95, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: '#1e3a5f'
+              },
+              grid: {
+                color: '#e8e8e0'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#1e3a5f'
+              },
+              grid: {
+                color: '#e8e8e0'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function generateMonthlyReport() {
+      const reportContent = `
+PUNE MUNICIPAL CORPORATION
+URBAN SYSTEM PRESSURE SCORE (USPS) - MONTHLY REPORT
+Report Period: January 2026
+Generated: ${new Date().toLocaleDateString('en-IN')}
+
+========================================
+EXECUTIVE SUMMARY
+========================================
+
+Total Grid Cells Monitored: ${data ? data.usps.total_cells : 340}
+Average USPS Score: 62.4
+Critical Alerts: 247
+Peak Pressure Day: February 15, 2026
+
+========================================
+INFRASTRUCTURE RECOMMENDATIONS
+========================================
+
+PRIORITY 1: DRAINAGE SYSTEM UPGRADE
+- Target Wards: 4, 7, 12
+- Current Capacity Load: 78% average
+- Recommended Action: Increase drainage capacity by 30%
+- Estimated Cost: ₹45 Crores
+- Timeline: 6-8 months
+- Expected Impact: Reduce waterlogging incidents by 60%
+
+PRIORITY 2: TRAFFIC MANAGEMENT SYSTEM
+- Target Areas: High-congestion zones (8 junctions)
+- Current Congestion: 65% during peak hours
+- Recommended Action: Deploy smart traffic signals
+- Estimated Cost: ₹12 Crores
+- Timeline: 3-4 months
+- Expected Impact: Reduce congestion by 35%
+
+PRIORITY 3: HOSPITAL CAPACITY EXPANSION
+- Target Wards: 5, 9
+- Current Occupancy: 72% average
+- Recommended Action: Increase emergency beds by 20%, add 2 mobile units
+- Estimated Cost: ₹28 Crores
+- Timeline: 4-6 months
+- Expected Impact: Improve emergency response time by 40%
+
+PRIORITY 4: POWER INFRASTRUCTURE
+- Target Areas: High-demand zones (5 locations)
+- Current Stress: 68% during evening peak
+- Recommended Action: Install backup systems and additional substations
+- Estimated Cost: ₹35 Crores
+- Timeline: 8-10 months
+- Expected Impact: Reduce power outages by 75%
+
+========================================
+SUBSYSTEM ANALYSIS
+========================================
+
+Rain Accumulation: Average 45% pressure
+Drain Capacity: Average 78% load (CRITICAL)
+Road Congestion: Average 65% (HIGH)
+Hospital Occupancy: Average 72% (HIGH)
+Power Stress: Average 68% (HIGH)
+
+========================================
+BUDGET SUMMARY
+========================================
+
+Total Recommended Investment: ₹120 Crores
+Expected ROI: 3-5 years
+Risk Reduction: 55% overall improvement
+
+========================================
+CONCLUSION
+========================================
+
+Immediate action required on drainage infrastructure to prevent
+cascading failures during monsoon season. Traffic and hospital
+capacity improvements will significantly enhance urban resilience.
+
+Report prepared by: PuneRakshak USPS Monitoring System
+Contact: disaster-management@punecorp.gov.in
+      `;
+
+      // Create downloadable report
+      const blob = new Blob([reportContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `USPS_Monthly_Report_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert('Monthly report generated and downloaded successfully!');
+    }
+
+    document.getElementById('mode').addEventListener('change', () => {
+      if (data) render(data.usps.grid_cells);
+    });
+
+    initMap();
+    load();
+    updateTime();
+    setInterval(updateTime, 1000);
+    setInterval(load, 300000);
+  </script>
+</body>
+
+</html>

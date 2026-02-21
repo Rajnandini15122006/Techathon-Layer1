@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRVC Risk Assessment Dashboard - PuneRakshak</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #2c3e50
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
+      color: white;
+      padding: 24px 40px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+    }
+
+    .header h1 {
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px
+    }
+
+    .header p {
+      font-size: 0.95em;
+      opacity: 0.95
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 40px
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e7eb
+    }
+
+    .section-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #2c5aa0;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      background: #2c5aa0;
+      border-radius: 4px;
+      display: inline-block
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column
+    }
+
+    .form-label {
+      font-size: 0.85em;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px
+    }
+
+    .form-input {
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: #1e293b
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #2c5aa0;
+      box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1)
+    }
+
+    .btn-primary {
+      background: #2c5aa0;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .btn-primary:hover {
+      background: #1e3a8a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3)
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e7eb;
+      border-top: 4px solid #2c5aa0
+    }
+
+    .stat-label {
+      font-size: 0.8em;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-weight: 600
+    }
+
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px
+    }
+
+    .ward-list {
+      max-height: 500px;
+      overflow-y: auto
+    }
+
+    .ward-item {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      border-left: 4px solid #cbd5e1;
+      transition: all 0.2s
+    }
+
+    .ward-item:hover {
+      background: #e0e7ff;
+      transform: translateX(4px)
+    }
+
+    .ward-item.minimal {
+      border-left-color: #10b981
+    }
+
+    .ward-item.low {
+      border-left-color: #3b82f6
+    }
+
+    .ward-item.medium {
+      border-left-color: #fbbf24
+    }
+
+    .ward-item.high {
+      border-left-color: #f59e0b
+    }
+
+    .ward-item.critical {
+      border-left-color: #dc2626
+    }
+
+    .ward-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px
+    }
+
+    .ward-priority {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .ward-name {
+      font-size: 1em;
+      font-weight: 600;
+      color: #475569
+    }
+
+    .ward-badge {
+      background: #e5e7eb;
+      color: #475569;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .ward-badge.minimal {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .ward-badge.low {
+      background: #dbeafe;
+      color: #1e40af
+    }
+
+    .ward-badge.medium {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .ward-badge.high {
+      background: #fed7aa;
+      color: #9a3412
+    }
+
+    .ward-badge.critical {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .ward-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 0.85em
+    }
+
+    .ward-stat {
+      display: flex;
+      flex-direction: column
+    }
+
+    .ward-stat-label {
+      color: #94a3b8;
+      font-size: 0.9em;
+      margin-bottom: 2px
+    }
+
+    .ward-stat-value {
+      color: #1e293b;
+      font-weight: 700;
+      font-size: 1.1em
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85em
+    }
+
+    thead {
+      background: #2c5aa0;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10
+    }
+
+    th {
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75em;
+      letter-spacing: 0.5px
+    }
+
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      color: #475569
+    }
+
+    tbody tr:hover {
+      background: #f8fafc
+    }
+
+    .risk-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.85em;
+      text-align: center;
+      display: inline-block;
+      min-width: 60px
+    }
+
+    .risk-minimal {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .risk-low {
+      background: #dbeafe;
+      color: #1e40af
+    }
+
+    .risk-medium {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .risk-high {
+      background: #fed7aa;
+      color: #9a3412
+    }
+
+    .risk-critical {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #2c5aa0;
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <h1>HRVC Risk Assessment Dashboard</h1>
+    <p>Hazard-Risk-Vulnerability-Capacity Analysis Engine | Real-time Flood Risk Monitoring</p>
+    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/static/punerakshak.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Risk
+        Dashboard</a>
+      <a href="/static/alerts.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Alerts</a>
+      <a href="/static/usps_dashboard.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">USPS
+        Monitor</a>
+      <a href="/static/risk_dashboard.html"
+        style="color:white;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.2);border-radius:4px;font-size:0.85em;font-weight:600">HRVC
+        Risk</a>
+      <a href="/static/drainage_simulation.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Drainage
+        Sim</a>
+      <a href="/static/decision_dashboard.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Decision
+        Engine</a>
+      <a href="/static/community.html"
+        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Community</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="section-card">
+      <div class="section-title">
+        <span class="section-icon"></span>
+        Geographic Area Selection
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Latitude Min:</label>
+          <input type="number" class="form-input" id="lat-min" value="18.45" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Latitude Max:</label>
+          <input type="number" class="form-input" id="lat-max" value="18.60" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Longitude Min:</label>
+          <input type="number" class="form-input" id="lon-min" value="73.75" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Longitude Max:</label>
+          <input type="number" class="form-input" id="lon-max" value="73.95" step="0.01">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="loadData()">
+        <span>📊</span> Calculate Risk Scores
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Grid Cells</div>
+        <div class="stat-value" id="stat-cells">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Average Risk Score</div>
+        <div class="stat-value" id="stat-avg">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Critical Risk Cells</div>
+        <div class="stat-value" id="stat-critical">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">High Risk Cells</div>
+        <div class="stat-value" id="stat-high">-</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="section-card">
+        <div class="section-title">
+          <span class="section-icon"></span>
+          Ward-wise Priority Ranking
+        </div>
+        <div class="ward-list" id="ward-list">
+          <p style="text-align:center;color:#64748b;padding:40px">Click "Calculate Risk Scores" to load data</p>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">
+          <span class="section-icon"></span>
+          Grid Cell Risk Analysis
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cell ID</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Risk Score</th>
+                <th>Hazard</th>
+                <th>Exposure</th>
+                <th>Vulnerability</th>
+                <th>Capacity</th>
+              </tr>
+            </thead>
+            <tbody id="grid-table">
+              <tr>
+                <td colspan="8" style="text-align:center;padding:40px;color:#64748b">
+                  Click "Calculate Risk Scores" to load data
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentData, wardData;
+
+    async function loadData() {
+      document.getElementById('loading').style.display = 'flex';
+      try {
+        const latMin = document.getElementById('lat-min').value;
+        const latMax = document.getElementById('lat-max').value;
+        const lonMin = document.getElementById('lon-min').value;
+        const lonMax = document.getElementById('lon-max').value;
+
+        const params = `lat_min=${latMin}&lat_max=${latMax}&lon_min=${lonMin}&lon_max=${lonMax}`;
+
+        const [riskRes, wardRes] = await Promise.all([
+          fetch(`/api/risk/calculate?${params}`),
+          fetch(`/api/risk/ward-priorities?${params}`)
+        ]);
+
+        if (!riskRes.ok || !wardRes.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        currentData = await riskRes.json();
+        wardData = await wardRes.json();
+
+        updateStats();
+        renderWardList();
+        renderGridTable();
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load data: ' + error.message);
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('stat-cells').textContent = currentData.total_cells || 0;
+      document.getElementById('stat-avg').textContent = (currentData.summary?.avg_risk || 0).toFixed(2);
+      document.getElementById('stat-critical').textContent = currentData.summary?.critical_cells || 0;
+      document.getElementById('stat-high').textContent = currentData.summary?.high_risk_cells || 0;
+    }
+
+    function renderWardList() {
+      if (!wardData || !wardData.ward_priorities || wardData.ward_priorities.length === 0) {
+        document.getElementById('ward-list').innerHTML = '<p style="text-align:center;color:#64748b;padding:40px">No ward data available</p>';
+        return;
+      }
+
+      const html = wardData.ward_priorities.map(ward => {
+        const riskClass = getRiskClass(ward.avg_risk);
+        return `<div class="ward-item ${riskClass}">
+          <div class="ward-header">
+            <div>
+              <div class="ward-priority">Priority #${ward.priority_rank} - ${ward.ward_name}</div>
+            </div>
+            <span class="ward-badge ${riskClass}">${ward.priority_level}</span>
+          </div>
+          <div class="ward-stats">
+            <div class="ward-stat">
+              <span class="ward-stat-label">Avg Risk:</span>
+              <span class="ward-stat-value">${ward.avg_risk.toFixed(2)}</span>
+            </div>
+            <div class="ward-stat">
+              <span class="ward-stat-label">Max Risk:</span>
+              <span class="ward-stat-value">${ward.max_risk.toFixed(2)}</span>
+            </div>
+            <div class="ward-stat">
+              <span class="ward-stat-label">High Risk Cells:</span>
+              <span class="ward-stat-value">${ward.high_risk_cells}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('ward-list').innerHTML = html;
+    }
+
+    function renderGridTable() {
+      if (!currentData || !currentData.grid_cells || currentData.grid_cells.length === 0) {
+        document.getElementById('grid-table').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">No grid data available</td></tr>';
+        return;
+      }
+
+      const html = currentData.grid_cells.slice(0, 50).map(cell => {
+        const riskClass = getRiskClass(cell.risk_score);
+        return `<tr>
+          <td><strong>${cell.cell_id}</strong></td>
+          <td>${cell.latitude.toFixed(4)}</td>
+          <td>${cell.longitude.toFixed(4)}</td>
+          <td><span class="risk-badge risk-${riskClass}">${cell.risk_score.toFixed(1)}</span></td>
+          <td>${cell.components.hazard.toFixed(1)}</td>
+          <td>${cell.components.exposure.toFixed(1)}</td>
+          <td>${cell.components.vulnerability.toFixed(1)}</td>
+          <td>${cell.components.capacity.toFixed(1)}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('grid-table').innerHTML = html;
+    }
+
+    function getRiskClass(score) {
+      if (score >= 80) return 'critical';
+      if (score >= 60) return 'high';
+      if (score >= 40) return 'medium';
+      if (score >= 20) return 'low';
+      return 'minimal';
+    }
+
+    // Auto-load on page load
+    window.addEventListener('load', loadData);
+  </script>
+</body>
+
+</html>

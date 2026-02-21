@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drainage Stress Simulation - PuneRakshak</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0e1a;
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 16px 32px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      border-bottom: 3px solid #3b82f6;
+      position: relative;
+      z-index: 1000
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .header h1 {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #f0f9ff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)
+    }
+
+    .header-subtitle {
+      font-size: 0.85em;
+      color: #bfdbfe;
+      margin-top: 4px
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 20px
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 10px #10b981
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 0.6;
+        transform: scale(1.1)
+      }
+    }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr 360px;
+      gap: 0;
+      overflow: hidden;
+      position: relative
+    }
+
+    .control-panel {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border-right: 2px solid #334155;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3)
+    }
+
+    .panel-section {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2)
+    }
+
+    .section-title {
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: #60a5fa;
+      border-radius: 2px
+    }
+
+    .rain-presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px
+    }
+
+    .preset-btn {
+      padding: 14px;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: rgba(51, 65, 85, 0.3);
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      font-size: 0.9em;
+      text-align: center
+    }
+
+    .preset-btn:hover {
+      background: rgba(96, 165, 250, 0.2);
+      border-color: #60a5fa;
+      transform: translateY(-2px)
+    }
+
+    .preset-btn.active {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      border-color: #60a5fa;
+      color: white;
+      box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4)
+    }
+
+    .preset-value {
+      font-size: 1.2em;
+      display: block;
+      margin-top: 4px
+    }
+
+    .control-group {
+      margin-bottom: 20px
+    }
+
+    .control-label {
+      display: block;
+      font-size: 0.85em;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      font-weight: 600
+    }
+
+    .control-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.85em;
+      color: #94a3b8
+    }
+
+    .value-display {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #60a5fa;
+      text-shadow: 0 0 10px rgba(96, 165, 250, 0.5)
+    }
+
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #334155, #475569);
+      outline: none;
+      -webkit-appearance: none;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3)
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(96, 165, 250, 0.6);
+      border: 2px solid #1e293b
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      cursor: pointer;
+      border: 2px solid #1e293b
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4)
+    }
+
+    .btn-play:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.6)
+    }
+
+    .btn-pause {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4)
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #64748b, #475569);
+      color: white
+    }
+
+    .btn-reset:hover {
+      background: linear-gradient(135deg, #475569, #334155);
+      transform: translateY(-2px)
+    }
+
+    .map-container {
+      position: relative;
+      background: #0a0e1a;
+      overflow: hidden
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      filter: brightness(0.9) contrast(1.1)
+    }
+
+    /* Rainfall animation overlay */
+    .rain-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+      display: none
+    }
+
+    .rain-overlay.active {
+      display: block
+    }
+
+    .raindrop {
+      position: absolute;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.6));
+      animation: fall linear infinite;
+      opacity: 0.7
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh)
+      }
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 18px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px)
+    }
+
+    .legend-title {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 0.85em
+    }
+
+    .legend-color {
+      width: 28px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)
+    }
+
+    .stats-panel {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border-left: 2px solid #334155;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3)
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+      border-left: 4px solid #60a5fa;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s
+    }
+
+    .stat-card:hover {
+      transform: translateX(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3)
+    }
+
+    .stat-card.critical {
+      border-left-color: #ef4444;
+      background: rgba(239, 68, 68, 0.05)
+    }
+
+    .stat-card.warning {
+      border-left-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.05)
+    }
+
+    .stat-label {
+      font-size: 0.75em;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-weight: 600
+    }
+
+    .stat-value {
+      font-size: 2.2em;
+      font-weight: 700;
+      color: #f0f9ff;
+      line-height: 1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #334155;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 12px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3)
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+      background-size: 200% 100%;
+      transition: width 0.3s;
+      border-radius: 5px;
+      animation: shimmer 2s infinite
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    .zone-item {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 3px solid #ef4444;
+      transition: all 0.3s
+    }
+
+    .zone-item:hover {
+      background: rgba(239, 68, 68, 0.1);
+      transform: translateX(4px)
+    }
+
+    .zone-name {
+      font-weight: 700;
+      color: #f0f9ff;
+      margin-bottom: 8px;
+      font-size: 0.9em
+    }
+
+    .zone-stats {
+      display: flex;
+      gap: 16px;
+      font-size: 0.75em;
+      color: #94a3b8
+    }
+
+    .zone-stat-value {
+      color: #ef4444;
+      font-weight: 700
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 14, 26, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(10px)
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #334155;
+      border-top: 5px solid #60a5fa;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 20px rgba(96, 165, 250, 0.5)
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 1.1em;
+      color: #60a5fa;
+      font-weight: 600
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0f172a
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #334155, #475569);
+      border-radius: 5px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #475569, #60a5fa)
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+    <div class="loading-text">Simulating Drainage Stress...</div>
+  </div>
+
+  <header class="header">
+    <div class="header-content">
+      <div>
+        <h1>Drainage Stress Simulation</h1>
+        <div class="header-subtitle">Real-time Urban Flooding Analysis & Prediction System</div>
+      </div>
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span style="font-size:0.95em;font-weight:700">SYSTEM ACTIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <aside class="control-panel">
+      <div class="panel-section">
+        <div class="section-title">Rainfall Intensity Presets</div>
+
+        <div class="rain-presets">
+          <button class="preset-btn" onclick="setRainfall(10, 'Light Rain')">
+            <div>Light Rain</div>
+            <span class="preset-value">10 mm/hr</span>
+          </button>
+          <button class="preset-btn" onclick="setRainfall(30, 'Moderate')">
+            <div>Moderate</div>
+            <span class="preset-value">30 mm/hr</span>
+          </button>
+          <button class="preset-btn" onclick="setRainfall(60, 'Heavy Rain')">
+            <div>Heavy Rain</div>
+            <span class="preset-value">60 mm/hr</span>
+          </button>
+          <button class="preset-btn" onclick="setRainfall(120, 'Extreme')">
+            <div>Extreme</div>
+            <span class="preset-value">120 mm/hr</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">Custom Parameters</div>
+
+        <div class="control-group">
+          <label class="control-label">Rainfall Intensity</label>
+          <div class="control-value">
+            <span>0 mm/hr</span>
+            <span class="value-display" id="rainfall-value">50</span>
+            <span>200 mm/hr</span>
+          </div>
+          <input type="range" class="slider" id="rainfall-slider" min="0" max="200" value="50" step="5">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Rain Duration</label>
+          <div class="control-value">
+            <span>5 min</span>
+            <span class="value-display" id="duration-value">30</span>
+            <span>180 min</span>
+          </div>
+          <input type="range" class="slider" id="duration-slider" min="5" max="180" value="30" step="5">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">Simulation Controls</div>
+
+        <button class="btn btn-play" id="btn-play" onclick="startSimulation()">
+          <span>▶</span> Start Simulation
+        </button>
+        <button class="btn btn-pause" id="btn-pause" onclick="pauseSimulation()" style="display:none">
+          <span>⏸</span> Pause Simulation
+        </button>
+        <button class="btn btn-reset" onclick="resetSimulation()">
+          <span>↻</span> Reset
+        </button>
+
+        <div class="control-group" style="margin-top:18px">
+          <label class="control-label">Simulation Progress</label>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+          <div style="text-align:center;margin-top:10px;font-size:0.9em;color:#94a3b8;font-weight:600">
+            <span id="progress-text">Ready to simulate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">Hydrological Model</div>
+        <div
+          style="font-size:0.85em;line-height:1.8;color:#cbd5e1;background:rgba(51,65,85,0.3);padding:14px;border-radius:8px">
+          <strong style="color:#60a5fa">Runoff Volume:</strong><br>
+          V = R × A × C<br><br>
+          <strong style="color:#60a5fa">Stress Ratio:</strong><br>
+          S = Q / D<br><br>
+          <strong style="color:#60a5fa">Flood Depth:</strong><br>
+          F = (Q - D) × t / A<br><br>
+          <span style="font-size:0.9em;color:#94a3b8">
+            R=Rainfall, A=Area, C=Runoff Coef<br>
+            Q=Runoff Rate, D=Drain Capacity
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="map-container">
+      <div class="rain-overlay" id="rain-overlay"></div>
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="legend-title">Drainage Status</div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#10b981"></div>
+          <span>Safe (< 60%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#fbbf24"></div>
+          <span>High Load (60-85%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#f59e0b"></div>
+          <span>Critical (85-100%)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#ef4444"></div>
+          <span>Overflow (> 100%)</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="stats-panel">
+      <div class="panel-section">
+        <div class="section-title">Live Statistics</div>
+
+        <div class="stat-card">
+          <div class="stat-label">Total Overloaded Cells</div>
+          <div class="stat-value" id="stat-overflow">0</div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-label">Flooded Area</div>
+          <div class="stat-value" id="stat-area">0.00 <span style="font-size:0.5em">km²</span></div>
+        </div>
+
+        <div class="stat-card critical">
+          <div class="stat-label">Max Flood Depth</div>
+          <div class="stat-value" id="stat-depth">0 <span style="font-size:0.5em">cm</span></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Avg Stress Ratio</div>
+          <div class="stat-value" id="stat-stress">0.00</div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-title">Top 5 Critical Zones</div>
+        <div id="critical-zones-list">
+          <p style="text-align:center;color:#64748b;padding:24px;font-size:0.9em">
+            Run simulation to see critical zones
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    let map, gridLayer;
+    let simulationData = null;
+    let isSimulating = false;
+    let currentTimestep = 0;
+    let simulationInterval = null;
+    let rainInterval = null;
+
+    // Initialize map
+    function initMap() {
+      map = L.map('map', {
+        center: [18.5204, 73.8567],
+        zoom: 12,
+        zoomControl: true
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap, © CartoDB',
+        maxZoom: 18
+      }).addTo(map);
+    }
+
+    // Rainfall animation
+    function startRainAnimation() {
+      const overlay = document.getElementById('rain-overlay');
+      overlay.classList.add('active');
+
+      // Clear existing raindrops
+      overlay.innerHTML = '';
+
+      // Create raindrops
+      const numDrops = 150;
+      for (let i = 0; i < numDrops; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'raindrop';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        overlay.appendChild(drop);
+      }
+    }
+
+    function stopRainAnimation() {
+      const overlay = document.getElementById('rain-overlay');
+      overlay.classList.remove('active');
+    }
+
+    // Update slider displays
+    document.getElementById('rainfall-slider').addEventListener('input', (e) => {
+      document.getElementById('rainfall-value').textContent = e.target.value;
+      updatePresetButtons();
+    });
+
+    document.getElementById('duration-slider').addEventListener('input', (e) => {
+      document.getElementById('duration-value').textContent = e.target.value;
+    });
+
+    function setRainfall(value, name) {
+      document.getElementById('rainfall-slider').value = value;
+      document.getElementById('rainfall-value').textContent = value;
+      updatePresetButtons();
+    }
+
+    function updatePresetButtons() {
+      const value = parseInt(document.getElementById('rainfall-slider').value);
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      const presets = { 10: 0, 30: 1, 60: 2, 120: 3 };
+      if (presets[value] !== undefined) {
+        document.querySelectorAll('.preset-btn')[presets[value]].classList.add('active');
+      }
+    }
+
+    async function startSimulation() {
+      if (isSimulating) return;
+
+      const rainfall = parseFloat(document.getElementById('rainfall-slider').value);
+      const duration = parseFloat(document.getElementById('duration-slider').value);
+
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('btn-play').style.display = 'none';
+      document.getElementById('btn-pause').style.display = 'block';
+
+      // Start rain animation
+      startRainAnimation();
+
+      try {
+        const response = await fetch('/api/drainage/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            rainfall_intensity: rainfall,
+            rain_duration: duration,
+            lat_min: 18.45,
+            lat_max: 18.60,
+            lon_min: 73.75,
+            lon_max: 73.95,
+            timestep_minutes: 5
+          })
+        });
+
+        const data = await response.json();
+        simulationData = data.simulation;
+
+        isSimulating = true;
+        currentTimestep = 0;
+        animateSimulation();
+
+      } catch (error) {
+        console.error('Simulation error:', error);
+        alert('Failed to run simulation: ' + error.message);
+        resetSimulation();
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function animateSimulation() {
+      if (!isSimulating || !simulationData) return;
+
+      const timesteps = simulationData.timesteps;
+      const totalSteps = timesteps.length;
+
+      simulationInterval = setInterval(() => {
+        if (currentTimestep >= totalSteps) {
+          pauseSimulation();
+          document.getElementById('progress-text').textContent = 'Simulation Complete ✓';
+          stopRainAnimation();
+          return;
+        }
+
+        const stepData = timesteps[currentTimestep];
+        renderTimestep(stepData);
+
+        currentTimestep++;
+        const progress = (currentTimestep / totalSteps) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('progress-text').textContent =
+          `Timestep ${currentTimestep} of ${totalSteps} (${Math.round(progress)}%)`;
+
+      }, 1000); // 1 second per timestep
+    }
+
+    function renderTimestep(cells) {
+      if (gridLayer) map.removeLayer(gridLayer);
+
+      const features = cells.map(cell => {
+        const color = getStatusColor(cell.status_code);
+        const cellSize = 0.0045;
+
+        const bounds = [
+          [cell.latitude - cellSize, cell.longitude - cellSize],
+          [cell.latitude + cellSize, cell.longitude + cellSize]
+        ];
+
+        const rect = L.rectangle(bounds, {
+          color: color,
+          fillColor: color,
+          fillOpacity: cell.status_code === 3 ? 0.25 : cell.status_code === 2 ? 0.15 : cell.status_code === 1 ? 0.08 : 0.02,
+          weight: cell.status_code === 3 ? 1 : cell.status_code === 2 ? 0.5 : 0.2,
+          opacity: cell.status_code === 3 ? 0.4 : cell.status_code === 2 ? 0.25 : 0.1
+        });
+
+        rect.bindPopup(`
+          <div style="font-family:Arial;font-size:0.9em;color:#1e293b;min-width:200px">
+            <div style="background:${color};color:white;padding:8px;margin:-8px -8px 8px -8px;font-weight:700">
+              Cell ${cell.cell_id} - ${cell.ward_name}
+            </div>
+            <div style="padding:4px 0">
+              <strong style="color:${color}">Status: ${cell.status}</strong>
+            </div>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:8px 0">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85em">
+              <div>
+                <div style="color:#64748b">Stress Ratio</div>
+                <strong>${cell.stress_ratio.toFixed(2)}</strong>
+              </div>
+              <div>
+                <div style="color:#64748b">Flood Depth</div>
+                <strong style="color:#ef4444">${cell.flood_depth_cm.toFixed(1)} cm</strong>
+              </div>
+              <div>
+                <div style="color:#64748b">Runoff Rate</div>
+                <strong>${cell.runoff_rate_m3_per_s.toFixed(2)} m³/s</strong>
+              </div>
+              <div>
+                <div style="color:#64748b">Drain Capacity</div>
+                <strong>${cell.drain_capacity.toFixed(2)} m³/s</strong>
+              </div>
+            </div>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:8px 0">
+            <div style="font-size:0.8em;color:#64748b">
+              Land Use: <strong style="color:#1e293b">${cell.land_use}</strong>
+            </div>
+          </div>
+        `, {
+          maxWidth: 300,
+          className: 'custom-popup'
+        });
+
+        return rect;
+      });
+
+      gridLayer = L.layerGroup(features).addTo(map);
+
+      // Update statistics
+      updateStatistics(cells);
+    }
+
+    function updateStatistics(cells) {
+      const overflowCells = cells.filter(c => c.status_code === 3).length;
+      const floodedArea = (overflowCells * 0.0625).toFixed(3); // 250m x 250m = 0.0625 km²
+      const maxFlood = Math.max(...cells.map(c => c.flood_depth_cm));
+      const avgStress = (cells.reduce((sum, c) => sum + c.stress_ratio, 0) / cells.length).toFixed(2);
+
+      document.getElementById('stat-overflow').textContent = overflowCells;
+      document.getElementById('stat-area').innerHTML = floodedArea + ' <span style="font-size:0.5em">km²</span>';
+      document.getElementById('stat-depth').innerHTML = maxFlood.toFixed(0) + ' <span style="font-size:0.5em">cm</span>';
+      document.getElementById('stat-stress').textContent = avgStress;
+
+      // Update critical zones
+      const criticalZones = cells
+        .filter(c => c.status_code >= 2)
+        .sort((a, b) => b.stress_ratio - a.stress_ratio)
+        .slice(0, 5);
+
+      if (criticalZones.length > 0) {
+        const html = criticalZones.map(zone => `
+          <div class="zone-item">
+            <div class="zone-name">${zone.ward_name} - Cell ${zone.cell_id}</div>
+            <div class="zone-stats">
+              <div>Stress: <span class="zone-stat-value">${zone.stress_ratio.toFixed(2)}</span></div>
+              <div>Flood: <span class="zone-stat-value">${zone.flood_depth_cm.toFixed(1)} cm</span></div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('critical-zones-list').innerHTML = html;
+      } else {
+        document.getElementById('critical-zones-list').innerHTML =
+          '<p style="text-align:center;color:#10b981;padding:24px;font-size:0.9em">✓ No Critical Zones</p>';
+      }
+    }
+
+    function getStatusColor(statusCode) {
+      switch (statusCode) {
+        case 0: return '#10b981'; // Safe - Green
+        case 1: return '#fbbf24'; // High Load - Yellow
+        case 2: return '#f59e0b'; // Critical - Orange
+        case 3: return '#ef4444'; // Overflow - Red
+        default: return '#64748b';
+      }
+    }
+
+    function pauseSimulation() {
+      isSimulating = false;
+      if (simulationInterval) {
+        clearInterval(simulationInterval);
+        simulationInterval = null;
+      }
+      stopRainAnimation();
+      document.getElementById('btn-play').style.display = 'block';
+      document.getElementById('btn-pause').style.display = 'none';
+    }
+
+    function resetSimulation() {
+      pauseSimulation();
+      currentTimestep = 0;
+      simulationData = null;
+      if (gridLayer) map.removeLayer(gridLayer);
+
+      document.getElementById('progress-fill').style.width = '0%';
+      document.getElementById('progress-text').textContent = 'Ready to simulate';
+      document.getElementById('stat-overflow').textContent = '0';
+      document.getElementById('stat-area').innerHTML = '0.00 <span style="font-size:0.5em">km²</span>';
+      document.getElementById('stat-depth').innerHTML = '0 <span style="font-size:0.5em">cm</span>';
+      document.getElementById('stat-stress').textContent = '0.00';
+      document.getElementById('critical-zones-list').innerHTML =
+        '<p style="text-align:center;color:#64748b;padding:24px;font-size:0.9em">Run simulation to see critical zones</p>';
+    }
+
+    // Initialize
+    initMap();
+    updatePresetButtons();
+  </script>
+</body>
+
+</html>

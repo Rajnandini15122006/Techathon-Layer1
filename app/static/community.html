@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Complaints - PuneRakshak</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .header {
+      background: #1e40af;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #1e3a8a
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1
+    }
+
+    .page-header {
+      margin-bottom: 24px
+    }
+
+    .page-title {
+      font-size: 2em;
+      color: #1e293b;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .page-subtitle {
+      font-size: 1em;
+      color: #64748b
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      border: 1px solid #e5e7eb
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      color: #1e293b;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb
+    }
+
+    .form-group {
+      margin-bottom: 18px
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #475569;
+      font-size: 0.9em;
+      font-weight: 600
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-family: inherit
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px
+    }
+
+    .map-container {
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 12px
+    }
+
+    .map-hint {
+      font-size: 0.85em;
+      color: #64748b;
+      font-style: italic
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      width: 100%
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3)
+    }
+
+    .complaints-list {
+      max-height: 600px;
+      overflow-y: auto
+    }
+
+    .complaint-item {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 4px solid #3b82f6
+    }
+
+    .complaint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px
+    }
+
+    .complaint-id {
+      font-weight: 700;
+      color: #2563eb;
+      font-size: 0.9em
+    }
+
+    .complaint-status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .status-open {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .status-review {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .status-resolved {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .complaint-category {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8em;
+      font-weight: 600;
+      margin-bottom: 8px
+    }
+
+    .complaint-desc {
+      font-size: 0.9em;
+      color: #475569;
+      margin-bottom: 8px;
+      line-height: 1.5
+    }
+
+    .complaint-meta {
+      font-size: 0.8em;
+      color: #94a3b8;
+      display: flex;
+      gap: 16px
+    }
+
+    .success-message {
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Dashboard</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/community.html" class="nav-btn active">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#3b82f6;margin-left:8px">
+        <span id="time">08:10 pm</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Community Complaints</h1>
+      <p class="page-subtitle">Report infrastructure issues and track complaint status</p>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h2 class="card-title">Submit New Complaint</h2>
+
+        <div id="success-msg" class="success-message">
+          ✓ Complaint submitted successfully! Your complaint ID: <strong id="complaint-id"></strong>
+        </div>
+
+        <form id="complaint-form">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="category" required>
+              <option value="">Select category</option>
+              <option value="waterlogging">Waterlogging</option>
+              <option value="drain_blockage">Drain Blockage</option>
+              <option value="road_damage">Road Damage</option>
+              <option value="power_issue">Power Issue</option>
+              <option value="water_supply">Water Supply</option>
+              <option value="garbage">Garbage Collection</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location *</label>
+            <div id="map" class="map-container"></div>
+            <p class="map-hint">Click on the map to select location</p>
+            <input type="hidden" id="latitude" required>
+            <input type="hidden" id="longitude" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ward / Area</label>
+            <input type="text" class="form-input" id="ward" placeholder="e.g., Ward 21, Kothrud">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description *</label>
+            <textarea class="form-textarea" id="description" required
+              placeholder="Describe the issue in detail..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input type="text" class="form-input" id="name" placeholder="Optional">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Number</label>
+            <input type="tel" class="form-input" id="contact" placeholder="Optional">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <select class="form-select" id="language">
+              <option value="en">English</option>
+              <option value="mr">मराठी (Marathi)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit Complaint</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Recent Complaints</h2>
+        <div class="complaints-list" id="complaints-list">
+          <p style="text-align:center;color:#64748b;padding:40px">Loading complaints...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map, marker, complaints = [];
+
+    function initMap() {
+      map = L.map('map').setView([18.5204, 73.8567], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 18
+      }).addTo(map);
+
+      map.on('click', function (e) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(e.latlng).addTo(map);
+        document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+        document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+      });
+    }
+
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function loadComplaints() {
+      // Mock data - in production, fetch from API
+      complaints = [
+        {
+          id: 'CMP-001',
+          category: 'waterlogging',
+          ward: 'Ward 21',
+          description: 'Severe waterlogging near Kothrud bus stop after rain',
+          status: 'open',
+          date: '2024-02-20',
+          name: 'Citizen'
+        },
+        {
+          id: 'CMP-002',
+          category: 'drain_blockage',
+          ward: 'Ward 15',
+          description: 'Drain blocked causing overflow on main road',
+          status: 'review',
+          date: '2024-02-19',
+          name: 'Resident'
+        },
+        {
+          id: 'CMP-003',
+          category: 'road_damage',
+          ward: 'Ward 8',
+          description: 'Large pothole causing traffic issues',
+          status: 'resolved',
+          date: '2024-02-18',
+          name: 'Anonymous'
+        }
+      ];
+
+      renderComplaints();
+    }
+
+    function renderComplaints() {
+      const categoryNames = {
+        waterlogging: 'Waterlogging',
+        drain_blockage: 'Drain Blockage',
+        road_damage: 'Road Damage',
+        power_issue: 'Power Issue',
+        water_supply: 'Water Supply',
+        garbage: 'Garbage',
+        other: 'Other'
+      };
+
+      const html = complaints.map(c => {
+        const statusClass = c.status === 'open' ? 'status-open' : c.status === 'review' ? 'status-review' : 'status-resolved';
+        return `<div class="complaint-item">
+          <div class="complaint-header">
+            <span class="complaint-id">${c.id}</span>
+            <span class="complaint-status ${statusClass}">${c.status}</span>
+          </div>
+          <div class="complaint-category">${categoryNames[c.category]}</div>
+          <div class="complaint-desc">${c.description}</div>
+          <div class="complaint-meta">
+            <span>📍 ${c.ward}</span>
+            <span>📅 ${c.date}</span>
+            <span>👤 ${c.name}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('complaints-list').innerHTML = html;
+    }
+
+    document.getElementById('complaint-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const newComplaint = {
+        id: 'CMP-' + String(complaints.length + 1).padStart(3, '0'),
+        category: document.getElementById('category').value,
+        ward: document.getElementById('ward').value || 'Not specified',
+        description: document.getElementById('description').value,
+        status: 'open',
+        date: new Date().toISOString().split('T')[0],
+        name: document.getElementById('name').value || 'Anonymous',
+        latitude: document.getElementById('latitude').value,
+        longitude: document.getElementById('longitude').value,
+        language: document.getElementById('language').value
+      };
+
+      complaints.unshift(newComplaint);
+      renderComplaints();
+
+      document.getElementById('complaint-id').textContent = newComplaint.id;
+      document.getElementById('success-msg').style.display = 'block';
+
+      this.reset();
+      if (marker) map.removeLayer(marker);
+
+      setTimeout(() => {
+        document.getElementById('success-msg').style.display = 'none';
+      }, 5000);
+    });
+
+    initMap();
+    loadComplaints();
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+
+</html>

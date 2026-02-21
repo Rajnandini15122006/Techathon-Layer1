@@ -21,6 +21,13 @@ class GridCell(Base):
     infra_count = Column(Integer, default=0, comment="Count of hospitals and shelters")
     complaint_density = Column(Float, default=0.0, comment="Flood complaints per square kilometer")
     
+    # Layer 3: HRVC Risk Scores
+    hazard_score = Column(Float, nullable=True, comment="Hazard score (0-100)")
+    vulnerability_score = Column(Float, nullable=True, comment="Vulnerability score (0-100)")
+    capacity_score = Column(Float, nullable=True, comment="Capacity score (0-100)")
+    risk_score = Column(Float, nullable=True, comment="Final HRVC risk score (0-100)")
+    risk_level = Column(String, nullable=True, comment="Risk level: Low/Medium/High/Critical")
+    
     # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
 
