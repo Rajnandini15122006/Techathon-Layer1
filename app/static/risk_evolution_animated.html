@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Evolution Timeline - PuneRakshak</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #F5F8FC;
+      color: #2c3e50;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #0A2F5A;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D;
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white;
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 110px);
+    }
+
+    .map-container {
+      position: relative;
+      flex: 1;
+      background: #e5e7eb;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .timeline-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      min-width: 800px;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .timeline-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #0A2F5A;
+    }
+
+    .timeline-time {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #1E5C96;
+      font-family: 'Courier New', monospace;
+    }
+
+    .playback-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .control-btn {
+      background: #0A2F5A;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-btn:hover {
+      background: #123E6D;
+      transform: translateY(-2px);
+    }
+
+    .control-btn.playing {
+      background: #ef4444;
+    }
+
+    .control-btn.playing:hover {
+      background: #dc2626;
+    }
+
+    .speed-control {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .speed-btn {
+      background: #f8fafc;
+      border: 2px solid #e5e7eb;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #64748b;
+    }
+
+    .speed-btn:hover {
+      border-color: #1E5C96;
+      color: #1E5C96;
+    }
+
+    .speed-btn.active {
+      background: #1E5C96;
+      border-color: #1E5C96;
+      color: white;
+    }
+
+    .timeline-slider-container {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .timeline-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1E5C96;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1E5C96;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-markers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75em;
+      color: #64748b;
+      margin-top: 8px;
+    }
+
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      min-width: 280px;
+    }
+
+    .info-title {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #0A2F5A;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9em;
+    }
+
+    .info-stat:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    .legend-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+
+    .legend-title {
+      font-size: 0.85em;
+      font-weight: 700;
+      color: #0A2F5A;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.85em;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #1E5C96;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    .pulse-marker {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Timeline Data...</div>
+  </div>
+
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn active">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="map-container">
+      <div id="map"></div>
+
+      <div class="legend-panel">
+        <div class="legend-title">Risk Levels</div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#10b981"></div>
+          <span>Low (0-25)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#fbbf24"></div>
+          <span>Medium (25-50)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#f59e0b"></div>
+          <span>High (50-75)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#ef4444"></div>
+          <span>Critical (75-100)</span>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <div class="info-title">Current Statistics</div>
+        <div class="info-stat">
+          <span class="info-label">Total Cells:</span>
+          <span class="info-value" id="stat-total">340</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-label">High Risk:</span>
+          <span class="info-value" id="stat-high">0</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-label">Critical:</span>
+          <span class="info-value" id="stat-critical">0</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-label">Avg Risk:</span>
+          <span class="info-value" id="stat-avg">0</span>
+        </div>
+      </div>
+
+      <div class="timeline-controls">
+        <div class="timeline-header">
+          <div class="timeline-title">24-Hour Risk Evolution Playback</div>
+          <div class="timeline-time" id="current-time">Hour 0</div>
+        </div>
+
+        <div class="playback-controls">
+          <button class="control-btn" id="play-btn" onclick="togglePlayback()">
+            <span id="play-icon">▶</span>
+            <span id="play-text">Play</span>
+          </button>
+          <button class="control-btn" onclick="resetTimeline()">
+            <span>⟲</span>
+            <span>Reset</span>
+          </button>
+
+          <div class="speed-control">
+            <span style="font-size:0.85em;color:#64748b;font-weight:600;margin-right:8px">Speed:</span>
+            <button class="speed-btn" onclick="setSpeed(1)">1x</button>
+            <button class="speed-btn active" onclick="setSpeed(2)">2x</button>
+            <button class="speed-btn" onclick="setSpeed(4)">4x</button>
+            <button class="speed-btn" onclick="setSpeed(8)">8x</button>
+          </div>
+        </div>
+
+        <div class="timeline-slider-container">
+          <input type="range" class="timeline-slider" id="timeline-slider" min="0" max="24" value="0" step="1"
+            oninput="updateTimelineManual(this.value)">
+        </div>
+
+        <div class="timeline-markers">
+          <span>Now</span>
+          <span>+6h</span>
+          <span>+12h</span>
+          <span>+18h</span>
+          <span>+24h</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map, gridLayer;
+    let isPlaying = false;
+    let currentHour = 0;
+    let playbackSpeed = 2; // 2x default
+    let playbackInterval;
+    let timelineData = [];
+    let gridCells = [];
+
+    // Initialize map
+    function initMap() {
+      map = L.map('map', {
+        center: [18.5204, 73.8567],
+        zoom: 12,
+        zoomControl: true
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(map);
+
+      loadTimelineData();
+    }
+
+    // Load timeline data
+    async function loadTimelineData() {
+      document.getElementById('loading').style.display = 'flex';
+
+      try {
+        // Get forecast data for 24 hours
+        const response = await fetch('/api/forecast/risk-evolution?current_risk=50');
+        const data = await response.json();
+
+        // Generate grid cells with risk evolution
+        generateGridCells(data.predictions);
+
+        // Render initial state
+        renderTimeline(0);
+
+      } catch (error) {
+        console.error('Error loading timeline:', error);
+        // Generate demo data if API fails
+        generateDemoData();
+        renderTimeline(0);
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    // Generate grid cells with risk evolution
+    function generateGridCells(predictions) {
+      const latMin = 18.45;
+      const latMax = 18.60;
+      const lonMin = 73.75;
+      const lonMax = 73.95;
+      const gridSize = 0.009; // ~1km
+
+      gridCells = [];
+      let id = 1;
+
+      for (let lat = latMin; lat < latMax; lat += gridSize) {
+        for (let lon = lonMin; lon < lonMax; lon += gridSize) {
+          const cell = {
+            id: id++,
+            lat: lat + gridSize / 2,
+            lon: lon + gridSize / 2,
+            timeline: []
+          };
+
+          // Generate risk evolution for each hour
+          for (let hour = 0; hour <= 24; hour++) {
+            const prediction = predictions[hour] || predictions[predictions.length - 1];
+            const baseRisk = prediction.risk_score;
+
+            // Add spatial variation
+            const spatialVariation = Math.sin(lat * 100) * Math.cos(lon * 100) * 20;
+            const temporalVariation = Math.sin(hour * 0.5) * 10;
+
+            let risk = baseRisk + spatialVariation + temporalVariation;
+            risk = Math.max(0, Math.min(100, risk));
+
+            cell.timeline.push({
+              hour: hour,
+              risk: risk,
+              level: getRiskLevel(risk)
+            });
+          }
+
+          gridCells.push(cell);
+        }
+      }
+    }
+
+    // Generate demo data if API fails
+    function generateDemoData() {
+      const latMin = 18.45;
+      const latMax = 18.60;
+      const lonMin = 73.75;
+      const lonMax = 73.95;
+      const gridSize = 0.009;
+
+      gridCells = [];
+      let id = 1;
+
+      for (let lat = latMin; lat < latMax; lat += gridSize) {
+        for (let lon = lonMin; lon < lonMax; lon += gridSize) {
+          const cell = {
+            id: id++,
+            lat: lat + gridSize / 2,
+            lon: lon + gridSize / 2,
+            timeline: []
+          };
+
+          // Generate realistic risk evolution
+          const baseRisk = 30 + Math.random() * 20;
+
+          for (let hour = 0; hour <= 24; hour++) {
+            // Risk increases over time with some randomness
+            const timeEffect = hour * 1.5;
+            const spatialEffect = Math.sin(lat * 100) * Math.cos(lon * 100) * 15;
+            const randomEffect = (Math.random() - 0.5) * 10;
+
+            let risk = baseRisk + timeEffect + spatialEffect + randomEffect;
+            risk = Math.max(0, Math.min(100, risk));
+
+            cell.timeline.push({
+              hour: hour,
+              risk: risk,
+              level: getRiskLevel(risk)
+            });
+          }
+
+          gridCells.push(cell);
+        }
+      }
+    }
+
+    // Get risk level from score
+    function getRiskLevel(score) {
+      if (score >= 75) return 'critical';
+      if (score >= 50) return 'high';
+      if (score >= 25) return 'medium';
+      return 'low';
+    }
+
+    // Get color for risk level
+    function getRiskColor(level) {
+      const colors = {
+        low: '#10b981',
+        medium: '#fbbf24',
+        high: '#f59e0b',
+        critical: '#ef4444'
+      };
+      return colors[level] || '#94a3b8';
+    }
+
+    // Render timeline at specific hour
+    function renderTimeline(hour) {
+      if (gridLayer) {
+        map.removeLayer(gridLayer);
+      }
+
+      const rectangles = gridCells.map(cell => {
+        const data = cell.timeline[hour];
+        const color = getRiskColor(data.level);
+        const gridSize = 0.009;
+
+        const bounds = [
+          [cell.lat - gridSize / 2, cell.lon - gridSize / 2],
+          [cell.lat + gridSize / 2, cell.lon + gridSize / 2]
+        ];
+
+        const rect = L.rectangle(bounds, {
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.3,
+          weight: 0.3,
+          opacity: 0.5
+        });
+
+        rect.bindPopup(`
+          <div style="font-family:Arial;min-width:180px">
+            <strong style="color:${color};font-size:1.1em">Cell #${cell.id}</strong>
+            <div style="margin:8px 0">
+              <strong>Hour:</strong> +${hour}h<br>
+              <strong>Risk Score:</strong> ${data.risk.toFixed(1)}<br>
+              <strong>Level:</strong> <span style="color:${color};font-weight:700;text-transform:uppercase">${data.level}</span>
+            </div>
+          </div>
+        `);
+
+        return rect;
+      });
+
+      gridLayer = L.layerGroup(rectangles).addTo(map);
+
+      // Update statistics
+      updateStatistics(hour);
+
+      // Update time display
+      document.getElementById('current-time').textContent = `Hour +${hour}`;
+      document.getElementById('timeline-slider').value = hour;
+    }
+
+    // Update statistics
+    function updateStatistics(hour) {
+      const risks = gridCells.map(cell => cell.timeline[hour]);
+
+      const highRisk = risks.filter(r => r.level === 'high' || r.level === 'critical').length;
+      const critical = risks.filter(r => r.level === 'critical').length;
+      const avgRisk = risks.reduce((sum, r) => sum + r.risk, 0) / risks.length;
+
+      document.getElementById('stat-total').textContent = gridCells.length;
+      document.getElementById('stat-high').textContent = highRisk;
+      document.getElementById('stat-critical').textContent = critical;
+      document.getElementById('stat-avg').textContent = avgRisk.toFixed(1);
+    }
+
+    // Toggle playback
+    function togglePlayback() {
+      isPlaying = !isPlaying;
+
+      const playBtn = document.getElementById('play-btn');
+      const playIcon = document.getElementById('play-icon');
+      const playText = document.getElementById('play-text');
+
+      if (isPlaying) {
+        playBtn.classList.add('playing');
+        playIcon.textContent = '⏸';
+        playText.textContent = 'Pause';
+        startPlayback();
+      } else {
+        playBtn.classList.remove('playing');
+        playIcon.textContent = '▶';
+        playText.textContent = 'Play';
+        stopPlayback();
+      }
+    }
+
+    // Start playback
+    function startPlayback() {
+      const interval = 1000 / playbackSpeed; // Adjust speed
+
+      playbackInterval = setInterval(() => {
+        currentHour++;
+
+        if (currentHour > 24) {
+          currentHour = 0; // Loop
+        }
+
+        renderTimeline(currentHour);
+      }, interval);
+    }
+
+    // Stop playback
+    function stopPlayback() {
+      if (playbackInterval) {
+        clearInterval(playbackInterval);
+        playbackInterval = null;
+      }
+    }
+
+    // Reset timeline
+    function resetTimeline() {
+      stopPlayback();
+      isPlaying = false;
+      currentHour = 0;
+
+      const playBtn = document.getElementById('play-btn');
+      const playIcon = document.getElementById('play-icon');
+      const playText = document.getElementById('play-text');
+
+      playBtn.classList.remove('playing');
+      playIcon.textContent = '▶';
+      playText.textContent = 'Play';
+
+      renderTimeline(0);
+    }
+
+    // Set playback speed
+    function setSpeed(speed) {
+      playbackSpeed = speed;
+
+      // Update active button
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Restart playback if playing
+      if (isPlaying) {
+        stopPlayback();
+        startPlayback();
+      }
+    }
+
+    // Manual timeline update
+    function updateTimelineManual(hour) {
+      currentHour = parseInt(hour);
+      renderTimeline(currentHour);
+
+      // Pause if playing
+      if (isPlaying) {
+        togglePlayback();
+      }
+    }
+
+    // Update time display
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }) + ' IST';
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      initMap();
+      updateTime();
+      setInterval(updateTime, 1000);
+    });
+  </script>
+</body>
+
+</html>

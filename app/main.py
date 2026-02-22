@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.database import init_db
-from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid, hrvc_risk, risk, usps, liquid_galaxy, drainage, decision, risk_memory, monitoring
+from app.routers import grid, sample_data, synthetic_grid, realtime, demo_grid, hrvc_risk, risk, usps, liquid_galaxy, drainage, decision, risk_memory, monitoring, open_meteo, forecast
 import logging
 import os
 
@@ -52,6 +52,8 @@ app.include_router(drainage.router)
 app.include_router(decision.router)
 app.include_router(risk_memory.router)
 app.include_router(monitoring.router)
+app.include_router(open_meteo.router)  # Open-Meteo weather API
+app.include_router(forecast.router)  # Time-series forecasting
 if PRODUCTION_GRID_AVAILABLE:
     app.include_router(production_grid.router)
     logger.info("Production grid generation enabled")
@@ -73,7 +75,12 @@ async def startup_event():
 
 @app.get("/")
 def root():
-    """Serve the PuneRakshak homepage"""
+    """Serve the AI Forecast Dashboard (main feature)"""
+    forecast_page = os.path.join(os.path.dirname(__file__), "static", "forecast_dashboard.html")
+    if os.path.exists(forecast_page):
+        return FileResponse(forecast_page)
+    
+    # Fallback to punerakshak
     homepage = os.path.join(os.path.dirname(__file__), "static", "punerakshak.html")
     if os.path.exists(homepage):
         return FileResponse(homepage)

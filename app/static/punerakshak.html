@@ -16,7 +16,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: #f0f2f5;
+      background: #F5F8FC;
       color: #2c3e50;
       height: 100vh;
       display: flex;
@@ -24,11 +24,11 @@
     }
 
     .header {
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
       padding: 0;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #1e3a8a
+      border-bottom: 3px solid #123E6D
     }
 
     .logo-section {
@@ -131,7 +131,7 @@
     }
 
     .stat-card {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      background: #0A2F5A;
       color: white;
       padding: 12px 8px;
       border-radius: 6px;
@@ -153,7 +153,7 @@
     }
 
     .weather-card {
-      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      background: #0A2F5A;
       color: white;
       padding: 12px;
       border-radius: 6px;
@@ -212,6 +212,16 @@
     .risk-low {
       background: #d1fae5;
       color: #065f46
+    }
+
+    .risk-medium {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .risk-high {
+      background: #fee2e2;
+      color: #991b1b
     }
 
     .map-container {
@@ -288,7 +298,7 @@
     }
 
     .modal-header {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      background: #0A2F5A;
       color: white;
       padding: 16px 20px;
       border-radius: 10px 10px 0 0;
@@ -331,7 +341,7 @@
       background: #f8fafc;
       padding: 12px;
       border-radius: 6px;
-      border-left: 3px solid #3b82f6
+      border-left: 3px solid #1E5C96
     }
 
     .detail-label {
@@ -369,7 +379,7 @@
 
     .subsystem-value {
       font-weight: 700;
-      color: #2563eb
+      color: #1E5C96
     }
 
     .progress-bar {
@@ -395,7 +405,7 @@
     .message-title {
       font-size: 0.95em;
       font-weight: 700;
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 10px
     }
 
@@ -425,7 +435,7 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      background: #0A2F5A;
       color: white
     }
 
@@ -456,7 +466,7 @@
       width: 50px;
       height: 50px;
       border: 4px solid #e5e7eb;
-      border-top: 4px solid #3b82f6;
+      border-top: 4px solid #1E5C96;
       border-radius: 50%;
       animation: spin 1s linear infinite
     }
@@ -499,7 +509,8 @@
       </div>
     </div>
     <div class="nav-buttons">
-      <a href="/static/punerakshak.html" class="nav-btn active">Risk Dashboard</a>
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn active">Risk Analysis</a>
       <a href="/static/alerts.html" class="nav-btn">Alerts</a>
       <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
       <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
@@ -510,8 +521,8 @@
       <a href="/static/community.html" class="nav-btn">Community</a>
       <a href="/docs" class="nav-btn">API Docs</a>
       <div class="status-badge">System Active</div>
-      <div class="status-badge" style="background:#3b82f6;margin-left:8px">
-        <span id="time">08:10 pm</span>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
       </div>
     </div>
   </header>
@@ -542,47 +553,50 @@
 
       <div class="sidebar-section">
         <div class="section-title">🌤️ Real-time Weather</div>
-        <div class="weather-card">
+        <div class="weather-card" id="weatherCard">
           <div class="weather-title">Current Conditions - Pune</div>
           <div class="weather-grid">
             <div class="weather-item">
-              <div class="weather-value">28.5°C</div>
+              <div class="weather-value" id="weatherTemp">--</div>
               <div class="weather-label">Temperature</div>
             </div>
             <div class="weather-item">
-              <div class="weather-value">65%</div>
+              <div class="weather-value" id="weatherHumidity">--</div>
               <div class="weather-label">Humidity</div>
             </div>
             <div class="weather-item">
-              <div class="weather-value">3.5</div>
+              <div class="weather-value" id="weatherWind">--</div>
               <div class="weather-label">Wind Speed</div>
             </div>
             <div class="weather-item">
-              <div class="weather-value">0</div>
+              <div class="weather-value" id="weatherRain">--</div>
               <div class="weather-label">Rainfall mm</div>
             </div>
+          </div>
+          <div style="font-size: 0.6em; opacity: 0.8; margin-top: 6px; text-align: center;">
+            <span id="weatherDesc">Loading...</span>
           </div>
         </div>
       </div>
 
       <div class="sidebar-section">
         <div class="section-title">⚠️ Risk Assessment</div>
-        <ul class="risk-list">
+        <ul class="risk-list" id="riskList">
           <li class="risk-item">
             <span>Flood Risk (Now)</span>
-            <span class="risk-badge risk-low">Low</span>
+            <span class="risk-badge risk-low">--</span>
           </li>
           <li class="risk-item">
             <span>Flood Risk (24h)</span>
-            <span class="risk-badge risk-low">Low</span>
+            <span class="risk-badge risk-low">--</span>
           </li>
           <li class="risk-item">
             <span>Heat Risk</span>
-            <span class="risk-badge risk-low">Low</span>
+            <span class="risk-badge risk-low">--</span>
           </li>
           <li class="risk-item">
             <span>Storm Risk</span>
-            <span class="risk-badge risk-low">Low</span>
+            <span class="risk-badge risk-low">--</span>
           </li>
         </ul>
       </div>
@@ -628,7 +642,7 @@
         </div>
 
         <div class="subsystem-bars">
-          <h4 style="margin-bottom:14px;color:#2563eb;font-size:0.95em">Subsystem Pressures</h4>
+          <h4 style="margin-bottom:14px;color:#1E5C96;font-size:0.95em">Subsystem Pressures</h4>
           <div id="subsystem-list"></div>
         </div>
 
@@ -841,11 +855,64 @@
       document.getElementById('detailModal').classList.remove('active');
     }
 
+    async function loadWeatherData() {
+      try {
+        const response = await fetch('/api/weather/disaster-risk');
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+          // Update weather display
+          document.getElementById('weatherTemp').textContent = `${data.current_conditions.temperature}°C`;
+          document.getElementById('weatherHumidity').textContent = `${data.current_conditions.humidity}%`;
+          document.getElementById('weatherWind').textContent = `${data.current_conditions.wind_speed} km/h`;
+          document.getElementById('weatherRain').textContent = `${data.current_conditions.precipitation} mm`;
+          document.getElementById('weatherDesc').textContent = `${data.current_conditions.weather} • ${data.data_source}`;
+
+          // Update risk assessment
+          const floodCurrent = data.risk_assessment.flood_risk.current;
+          const floodForecast = data.risk_assessment.flood_risk.forecast_24h;
+          const heatRisk = data.risk_assessment.heat_risk.current;
+          const stormRisk = data.risk_assessment.storm_risk.current;
+
+          const riskHTML = `
+            <li class="risk-item">
+              <span>Flood Risk (Now)</span>
+              <span class="risk-badge ${getRiskBadgeClass(floodCurrent)}">${floodCurrent}</span>
+            </li>
+            <li class="risk-item">
+              <span>Flood Risk (24h)</span>
+              <span class="risk-badge ${getRiskBadgeClass(floodForecast)}">${floodForecast}</span>
+            </li>
+            <li class="risk-item">
+              <span>Heat Risk</span>
+              <span class="risk-badge ${getRiskBadgeClass(heatRisk)}">${heatRisk}</span>
+            </li>
+            <li class="risk-item">
+              <span>Storm Risk</span>
+              <span class="risk-badge ${getRiskBadgeClass(stormRisk)}">${stormRisk}</span>
+            </li>
+          `;
+          document.getElementById('riskList').innerHTML = riskHTML;
+        }
+      } catch (error) {
+        console.error('Error loading weather data:', error);
+      }
+    }
+
+    function getRiskBadgeClass(risk) {
+      const riskLower = risk.toLowerCase();
+      if (riskLower === 'high' || riskLower === 'critical') return 'risk-high';
+      if (riskLower === 'medium' || riskLower === 'moderate') return 'risk-medium';
+      return 'risk-low';
+    }
+
     initMap();
     loadData();
+    loadWeatherData();
     updateTime();
     setInterval(updateTime, 1000);
     setInterval(loadData, 300000);
+    setInterval(loadWeatherData, 300000); // Refresh weather every 5 minutes
   </script>
 </body>
 

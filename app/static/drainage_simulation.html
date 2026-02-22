@@ -25,12 +25,74 @@
     }
 
     .header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-      padding: 16px 32px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      border-bottom: 3px solid #3b82f6;
-      position: relative;
-      z-index: 1000
+      background: #0A2F5A;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
     }
 
     .header-content {
@@ -94,7 +156,7 @@
     }
 
     .control-panel {
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      background: #0A2F5A;
       border-right: 2px solid #334155;
       overflow-y: auto;
       padding: 24px;
@@ -157,7 +219,7 @@
     }
 
     .preset-btn.active {
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      background: #0A2F5A;
       border-color: #60a5fa;
       color: white;
       box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4)
@@ -201,7 +263,7 @@
       width: 100%;
       height: 8px;
       border-radius: 4px;
-      background: linear-gradient(90deg, #334155, #475569);
+      background: #0A2F5A;
       outline: none;
       -webkit-appearance: none;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3)
@@ -213,7 +275,7 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      background: #0A2F5A;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(96, 165, 250, 0.6);
       border: 2px solid #1e293b
@@ -223,7 +285,7 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      background: #0A2F5A;
       cursor: pointer;
       border: 2px solid #1e293b
     }
@@ -247,30 +309,30 @@
     }
 
     .btn-play {
-      background: linear-gradient(135deg, #10b981, #059669);
+      background: #0A2F5A;
       color: white;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4)
     }
 
     .btn-play:hover {
-      background: linear-gradient(135deg, #059669, #047857);
+      background: #0A2F5A;
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(16, 185, 129, 0.6)
     }
 
     .btn-pause {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+      background: #0A2F5A;
       color: white;
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4)
     }
 
     .btn-reset {
-      background: linear-gradient(135deg, #64748b, #475569);
+      background: #0A2F5A;
       color: white
     }
 
     .btn-reset:hover {
-      background: linear-gradient(135deg, #475569, #334155);
+      background: #0A2F5A;
       transform: translateY(-2px)
     }
 
@@ -306,7 +368,7 @@
       position: absolute;
       width: 2px;
       height: 20px;
-      background: linear-gradient(180deg, transparent, rgba(96, 165, 250, 0.6));
+      background: #0A2F5A);
       animation: fall linear infinite;
       opacity: 0.7
     }
@@ -356,7 +418,7 @@
     }
 
     .stats-panel {
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      background: #0A2F5A;
       border-left: 2px solid #334155;
       overflow-y: auto;
       padding: 24px;
@@ -418,7 +480,7 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+      background: #0A2F5A;
       background-size: 200% 100%;
       transition: width 0.3s;
       border-radius: 5px;
@@ -519,12 +581,12 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #334155, #475569);
+      background: #0A2F5A;
       border-radius: 5px
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, #475569, #60a5fa)
+      background: #0A2F5A
     }
   </style>
 </head>
@@ -535,42 +597,29 @@
     <div class="loading-text">Simulating Drainage Stress...</div>
   </div>
 
-  <header class="header">
-    <div class="header-content">
-      <div>
-        <h1>Drainage Stress Simulation</h1>
-        <div class="header-subtitle">Real-time Urban Flooding Analysis & Prediction System</div>
-      </div>
-      <div class="status-indicator">
-        <div class="status-dot"></div>
-        <span style="font-size:0.95em;font-weight:700">SYSTEM ACTIVE</span>
+      <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
       </div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <a href="/static/punerakshak.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Risk
-        Dashboard</a>
-      <a href="/static/alerts.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Alerts</a>
-      <a href="/static/usps_dashboard.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">USPS
-        Monitor</a>
-      <a href="/static/risk_dashboard.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">HRVC
-        Risk</a>
-      <a href="/static/drainage_simulation.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.2);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Drainage
-        Sim</a>
-      <a href="/static/decision_dashboard.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Decision
-        Engine</a>
-      <a href="/static/risk_evolution.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Risk
-        Evolution</a>
-      <a href="/static/monitoring_dashboard.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Monitoring</a>
-      <a href="/static/community.html"
-        style="padding:8px 16px;background:rgba(255,255,255,0.1);color:white;text-decoration:none;border-radius:4px;font-size:0.85em">Community</a>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn active">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
+      </div>
     </div>
   </header>
 

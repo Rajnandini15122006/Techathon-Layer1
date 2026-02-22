@@ -17,16 +17,80 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
+      background: #F5F8FC;
       color: #2c3e50;
       overflow: hidden
     }
 
     .header {
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
-      padding: 14px 32px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
     }
 
     .header h1 {
@@ -94,7 +158,7 @@
     .section-title {
       font-size: 0.9em;
       font-weight: 700;
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px
@@ -124,14 +188,14 @@
     .form-select:focus,
     .form-input:focus {
       outline: none;
-      border-color: #3b82f6;
+      border-color: #1E5C96;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)
     }
 
     .btn {
       width: 100%;
       padding: 10px;
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
       border: none;
       border-radius: 4px;
@@ -142,7 +206,7 @@
     }
 
     .btn:hover {
-      background: #1e3a8a
+      background: #123E6D
     }
 
     .btn-secondary {
@@ -164,7 +228,7 @@
     .legend-title {
       font-size: 0.85em;
       font-weight: 700;
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 10px
     }
 
@@ -258,7 +322,7 @@
     .chart-title {
       font-size: 0.9em;
       font-weight: 700;
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 12px;
       flex-shrink: 0
     }
@@ -279,7 +343,7 @@
       background: #f8fafc;
       padding: 12px;
       border-radius: 6px;
-      border-left: 3px solid #1e40af;
+      border-left: 3px solid #0A2F5A;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -317,7 +381,7 @@
       width: 50px;
       height: 50px;
       border: 4px solid #e5e7eb;
-      border-top-color: #3b82f6;
+      border-top-color: #1E5C96;
       border-radius: 50%;
       animation: spin 1s linear infinite
     }
@@ -339,17 +403,17 @@
       padding: 14px;
       border-radius: 6px;
       margin-bottom: 16px;
-      border-left: 3px solid #1e40af
+      border-left: 3px solid #0A2F5A
     }
 
     border-radius: 6px;
     margin-bottom: 16px;
-    border-left: 3px solid #3b82f6
+    border-left: 3px solid #1E5C96
     }
 
     .grid-info h3 {
       font-size: 1em;
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 8px
     }
 
@@ -399,18 +463,28 @@
   </div>
 
   <header class="header">
-    <h1>Risk Evolution Analytics</h1>
-    <div class="header-subtitle">Historical Risk Memory & Hotspot Evolution Tracking System</div>
-    <div class="nav">
-      <a href="/static/punerakshak.html">Risk Dashboard</a>
-      <a href="/static/alerts.html">Alerts</a>
-      <a href="/static/usps_dashboard.html">USPS Monitor</a>
-      <a href="/static/risk_dashboard.html">HRVC Risk</a>
-      <a href="/static/drainage_simulation.html">Drainage Sim</a>
-      <a href="/static/decision_dashboard.html">Decision Engine</a>
-      <a href="/static/risk_evolution.html" class="active">Risk Evolution</a>
-      <a href="/static/monitoring_dashboard.html">Monitoring</a>
-      <a href="/static/community.html">Community</a>
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn active">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
+      </div>
     </div>
   </header>
 
@@ -448,6 +522,8 @@
         <div class="panel-section">
           <div class="section-title">Actions</div>
           <button class="btn" onclick="refreshData()">Refresh Data</button>
+          <button class="btn" style="margin-top:10px;background:#1E5C96"
+            onclick="window.location.href='/static/risk_evolution_animated.html'">🎬 Animated Timeline</button>
           <button class="btn btn-secondary" style="margin-top:10px" onclick="exportReport()">Export Audit
             Report</button>
         </div>
@@ -625,7 +701,7 @@
           datasets: [{
             label: 'Accuracy',
             data: accuracyData.map(d => d.accuracy * 100),
-            borderColor: '#3b82f6',
+            borderColor: '#1E5C96',
             backgroundColor: 'rgba(59,130,246,0.1)',
             tension: 0.3,
             fill: true

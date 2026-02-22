@@ -14,15 +14,79 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
+      background: #F5F8FC;
       color: #2c3e50
     }
 
     .header {
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
-      padding: 14px 32px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
     }
 
     .header h1 {
@@ -77,14 +141,14 @@
     }
 
     .control-panel h2 {
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 16px;
       font-size: 1.3em
     }
 
     .btn {
       padding: 12px 24px;
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
       border: none;
       border-radius: 6px;
@@ -95,7 +159,7 @@
     }
 
     .btn:hover {
-      background: #1e3a8a;
+      background: #123E6D;
       transform: translateY(-2px)
     }
 
@@ -117,7 +181,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-left: 4px solid #1e40af
+      border-left: 4px solid #0A2F5A
     }
 
     .stat-card.success {
@@ -154,7 +218,7 @@
     }
 
     .section h3 {
-      color: #1e40af;
+      color: #0A2F5A;
       margin-bottom: 16px;
       font-size: 1.1em;
       border-bottom: 2px solid #e5e7eb;
@@ -171,7 +235,7 @@
       margin-bottom: 10px;
       background: #f8fafc;
       border-radius: 6px;
-      border-left: 4px solid #3b82f6
+      border-left: 4px solid #1E5C96
     }
 
     .cycle-item.success {
@@ -238,7 +302,7 @@
 
     .severity-watch {
       background: #dbeafe;
-      color: #1e40af
+      color: #0A2F5A
     }
 
     .status-indicator {
@@ -285,7 +349,7 @@
       width: 40px;
       height: 40px;
       border: 4px solid #e5e7eb;
-      border-top-color: #3b82f6;
+      border-top-color: #1E5C96;
       border-radius: 50%;
       animation: spin 1s linear infinite
     }
@@ -299,20 +363,29 @@
 </head>
 
 <body>
-  <header class="header">
-    <h1>Monitoring Control Center</h1>
-    <div class="header-subtitle">Real-Time System Monitoring & Alert Management</div>
-    <div class="nav">
-      <a href="/static/punerakshak.html">Risk Dashboard</a>
-      <a href="/static/alerts.html">Alerts</a>
-      <a href="/static/usps_dashboard.html">USPS Monitor</a>
-      <a href="/static/risk_dashboard.html">HRVC Risk</a>
-      <a href="/static/drainage_simulation.html">Drainage Sim</a>
-      <a href="/static/decision_dashboard.html">Decision Engine</a>
-      <a href="/static/risk_evolution.html">Risk Evolution</a>
-      <a href="/static/monitoring_dashboard.html" class="active">Monitoring</a>
-      <a href="/static/community.html">Community</a>
-      <a href="/docs">API Docs</a>
+      <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn active">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
+      </div>
     </div>
   </header>
 
@@ -376,7 +449,7 @@
       btn.textContent = '⏳ Running...';
       result.style.display = 'block';
       result.style.background = '#dbeafe';
-      result.style.color = '#1e40af';
+      result.style.color = '#0A2F5A';
       result.textContent = 'Monitoring cycle in progress...';
 
       try {

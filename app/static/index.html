@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,86 +15,78 @@
 
     body {
       font-family: 'Arial', sans-serif;
-      background: #f0f2f5;
+      background: #F5F8FC;
     }
 
     .header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: #0A2F5A;
       color: white;
-      padding: 15px 30px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D
+    }
+
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px
+    }
+
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
       display: flex;
+      gap: 0;
       align-items: center;
-      justify-content: space-between;
+      padding: 0 24px
     }
 
-    .header-left {
-      display: flex;
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
-      gap: 15px;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
     }
 
-    .logo {
-      width: 50px;
-      height: 50px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
     }
 
-    .header-title {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .header p {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 15px;
-      align-items: center;
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
     }
 
     .status-badge {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
       background: #10b981;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.5;
-      }
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
     }
 
     .container {
@@ -103,10 +95,131 @@
     }
 
     .sidebar {
-      width: 320px;
-      background: white;
-      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+      width: 200px;
+      background: #0A2F5A;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
+      color: white;
+    }
+
+    .panel {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .panel h2 {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 12px 10px;
+      border-radius: 6px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-card h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .stat-card p {
+      font-size: 9px;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .weather-panel {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .weather-panel h3 {
+      font-size: 11px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+
+    .weather-data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .weather-item {
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .weather-item strong {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .weather-item span {
+      font-size: 9px;
+      opacity: 0.8;
+    }
+
+    .risk-panel {
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 3px solid #10b981;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .risk-panel h3 {
+      font-size: 11px;
+      color: white;
+      margin-bottom: 10px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .risk-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 10px;
+      color: white;
+      align-items: center;
+    }
+
+    .risk-level {
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      background: rgba(16, 185, 129, 0.3);
+      color: #10b981;
     }
 
     .map-container {
@@ -117,161 +230,6 @@
     #map {
       width: 100%;
       height: 100%;
-    }
-
-    .panel {
-      padding: 20px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .panel h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1f2937;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .stat-card h3 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .stat-card p {
-      font-size: 11px;
-      opacity: 0.9;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .weather-panel {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .weather-panel h3 {
-      font-size: 14px;
-      margin-bottom: 12px;
-      opacity: 0.95;
-    }
-
-    .weather-data {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    .weather-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-    }
-
-    .risk-panel {
-      background: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 15px;
-      border-radius: 4px;
-      margin-bottom: 15px;
-    }
-
-    .risk-panel h3 {
-      font-size: 14px;
-      color: #92400e;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .risk-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 13px;
-      color: #78350f;
-    }
-
-    .risk-level {
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-    }
-
-    .risk-low {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .risk-medium {
-      background: #fed7aa;
-      color: #92400e;
-    }
-
-    .risk-high {
-      background: #fecaca;
-      color: #991b1b;
-    }
-
-    .legend {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    .legend h4 {
-      font-size: 14px;
-      margin-bottom: 12px;
-      color: #374151;
-      font-weight: 600;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .legend-color {
-      width: 30px;
-      height: 20px;
-      margin-right: 10px;
-      border-radius: 3px;
-      border: 1px solid #d1d5db;
-    }
-
-    .info-panel {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
-      padding: 15px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #1e40af;
-      line-height: 1.6;
     }
 
     .loading-overlay {
@@ -293,7 +251,7 @@
       width: 50px;
       height: 50px;
       border: 4px solid #e5e7eb;
-      border-top-color: #3b82f6;
+      border-top-color: #1E5C96;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -308,128 +266,110 @@
       color: #6b7280;
       font-size: 14px;
     }
-
-    .footer {
-      background: white;
-      padding: 8px 20px;
-      text-align: center;
-      font-size: 11px;
-      color: #6b7280;
-      border-top: 1px solid #e5e7eb;
-    }
   </style>
 </head>
 
 <body>
-  <div class="header">
-    <div class="header-left">
-      <div class="logo">🛡️</div>
-      <div class="header-title">
+  <header class="header">
+    <div class="logo-section">
+      <div class="brand">
         <h1>PuneRakshak</h1>
         <p>Disaster Risk Assessment & Monitoring System</p>
       </div>
     </div>
-    <div class="header-right">
-      <a href="/static/usps_dashboard.html" style="text-decoration: none;">
-        <div class="status-badge"
-          style="background: rgba(220, 38, 38, 0.2); cursor: pointer; color: #dc2626; border: 1px solid #dc2626;">
-          <span>🔴 USPS Monitor</span>
-        </div>
-      </a>
-      <a href="/static/risk_dashboard.html" style="text-decoration: none;">
-        <div class="status-badge" style="background: rgba(255, 255, 255, 0.3); cursor: pointer;">
-          <span>🟡 Risk Dashboard</span>
-        </div>
-      </a>
-      <a href="/static/risk_evolution.html" style="text-decoration: none;">
-        <div class="status-badge" style="background: rgba(59, 130, 246, 0.3); cursor: pointer;">
-          <span>📊 Risk Evolution</span>
-        </div>
-      </a>
-      <div class="status-badge">
-        <div class="status-dot"></div>
-        <span>System Active</span>
-      </div>
-      <div class="status-badge">
-        <span id="currentTime"></span>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn active">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="currentTime">--:--</span>
       </div>
     </div>
+  </header>
   </div>
 
   <div class="container">
     <div class="sidebar">
       <div class="panel">
-        <h2>📊 Coverage Statistics</h2>
+        <h2>COVERAGE STATISTICS</h2>
         <div class="stats-grid">
           <div class="stat-card">
-            <h3 id="totalCells">-</h3>
-            <p>Grid Cells</p>
+            <h3 id="totalCells">340</h3>
+            <p>GRID CELLS</p>
           </div>
           <div class="stat-card">
             <h3>250m</h3>
-            <p>Resolution</p>
+            <p>RESOLUTION</p>
           </div>
           <div class="stat-card">
-            <h3 id="coverageArea">-</h3>
-            <p>Area (km²)</p>
+            <h3 id="coverageArea">603.8</h3>
+            <p>AREA (KM²)</p>
           </div>
           <div class="stat-card">
             <h3>Pune</h3>
-            <p>City</p>
+            <p>CITY</p>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>🌦️ Real-time Weather</h2>
+        <h2>REAL-TIME WEATHER</h2>
         <div id="weatherPanel" class="weather-panel">
           <h3>Current Conditions - Pune</h3>
           <div class="weather-data" id="weatherData">
             <div class="weather-item">
-              <span>Loading...</span>
+              <strong id="temp">--</strong>
+              <span>Temperature</span>
+            </div>
+            <div class="weather-item">
+              <strong id="humidity">--</strong>
+              <span>Humidity</span>
+            </div>
+            <div class="weather-item">
+              <strong id="wind">--</strong>
+              <span>Wind Speed</span>
+            </div>
+            <div class="weather-item">
+              <strong id="rain">--</strong>
+              <span>Rainfall mm</span>
             </div>
           </div>
+          <div style="font-size: 9px; opacity: 0.7; margin-top: 8px; text-align: center;">
+            <span id="weatherSource">Loading...</span>
+          </div>
         </div>
+      </div>
 
+      <div class="panel">
+        <h2>RISK ASSESSMENT</h2>
         <div id="riskPanel" class="risk-panel">
-          <h3>⚠️ Risk Assessment</h3>
           <div id="riskData">
             <div class="risk-item">
-              <span>Analyzing...</span>
+              <span>Flood Risk (Now)</span>
+              <span class="risk-level">--</span>
+            </div>
+            <div class="risk-item">
+              <span>Flood Risk (24h)</span>
+              <span class="risk-level">--</span>
+            </div>
+            <div class="risk-item">
+              <span>Heat Risk</span>
+              <span class="risk-level">--</span>
+            </div>
+            <div class="risk-item">
+              <span>Storm Risk</span>
+              <span class="risk-level">--</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>📍 Legend</h2>
-        <div class="legend">
-          <h4>HRVC Risk Levels</h4>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #10b981;"></div>
-            <span>Low Risk (&lt;25)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #f59e0b;"></div>
-            <span>Medium Risk (25-50)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #ef4444;"></div>
-            <span>High Risk (50-75)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #dc2626;"></div>
-            <span>Critical Risk (&gt;75)</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="info-panel">
-          <strong>ℹ️ System Information</strong><br>
-          This platform provides real-time disaster risk assessment for Pune city using a 250m × 250m spatial grid. Each
-          cell contains computed risk indicators based on elevation, drainage proximity, population density, and current
-          weather conditions.
         </div>
       </div>
     </div>
@@ -443,17 +383,13 @@
     </div>
   </div>
 
-  <div class="footer">
-    © 2026 PuneRakshak - Disaster Risk Assessment System | Powered by Real-time Spatial Analytics
-  </div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     // Initialize map centered on Pune
     const map = L.map('map').setView([18.5204, 73.8567], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+      attribution: 'Â© OpenStreetMap contributors',
       maxZoom: 18
     }).addTo(map);
 
@@ -518,7 +454,7 @@
                 const layer = e.target;
                 layer.setStyle({
                   weight: 2,
-                  color: '#1e40af',
+                  color: '#0A2F5A',
                   fillOpacity: 0.8
                 });
               });
@@ -529,10 +465,10 @@
 
               const popup = `
                 <div style="font-family: Arial, sans-serif; min-width: 220px;">
-                  <h3 style="margin: 0 0 12px 0; color: #1e40af; font-size: 15px; border-bottom: 2px solid #3b82f6; padding-bottom: 6px;">Grid Cell #${props.id}</h3>
+                  <h3 style="margin: 0 0 12px 0; color: #0A2F5A; font-size: 15px; border-bottom: 2px solid #1E5C96; padding-bottom: 6px;">Grid Cell #${props.id}</h3>
                   ${props.risk_score !== null && props.risk_score !== undefined ? `
                   <div style="background: ${props.risk_level === 'Critical' ? '#fee2e2' : props.risk_level === 'High' ? '#fef3c7' : props.risk_level === 'Medium' ? '#dbeafe' : '#d1fae5'}; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center;">
-                    <strong style="color: ${props.risk_level === 'Critical' ? '#991b1b' : props.risk_level === 'High' ? '#92400e' : props.risk_level === 'Medium' ? '#1e40af' : '#065f46'};">Risk: ${props.risk_level} (${props.risk_score.toFixed(1)})</strong>
+                    <strong style="color: ${props.risk_level === 'Critical' ? '#991b1b' : props.risk_level === 'High' ? '#92400e' : props.risk_level === 'Medium' ? '#0A2F5A' : '#065f46'};">Risk: ${props.risk_level} (${props.risk_score.toFixed(1)})</strong>
                   </div>
                   <table style="width: 100%; font-size: 11px; margin-bottom: 8px;">
                     <tr><td><strong>Hazard:</strong></td><td style="text-align: right;">${props.hazard_score?.toFixed(1) || 'N/A'}</td></tr>
@@ -548,7 +484,7 @@
                     <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Slum Density:</strong></td><td style="text-align: right;">${props.slum_density?.toFixed(1) || 'N/A'}%</td></tr>
                     <tr style="border-bottom: 1px solid #e5e7eb; background: #fef3c7;"><td style="padding: 6px 0;"><strong>Flood Depth:</strong></td><td style="text-align: right; font-weight: 600; color: #92400e;">${props.flood_depth_avg?.toFixed(2) || 'N/A'} m</td></tr>
                     <tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 6px 0;"><strong>Infrastructure:</strong></td><td style="text-align: right;">${props.infra_count || 0} facilities</td></tr>
-                    <tr><td style="padding: 6px 0;"><strong>Complaints:</strong></td><td style="text-align: right;">${props.complaint_density?.toFixed(1) || 'N/A'}/km²</td></tr>
+                    <tr><td style="padding: 6px 0;"><strong>Complaints:</strong></td><td style="text-align: right;">${props.complaint_density?.toFixed(1) || 'N/A'}/kmÂ²</td></tr>
                   </table>
                 </div>
               `;
@@ -560,7 +496,7 @@
 
           // Update stats
           document.getElementById('totalCells').textContent = data.features.length.toLocaleString();
-          const area = (data.features.length * 0.0625).toFixed(1); // 250m x 250m = 0.0625 km²
+          const area = (data.features.length * 0.0625).toFixed(1); // 250m x 250m = 0.0625 kmÂ²
           document.getElementById('coverageArea').textContent = area;
 
           // Hide loading overlay
@@ -575,26 +511,26 @@
     // Load weather data
     async function loadWeatherData() {
       try {
-        const response = await fetch('/realtime/disaster-summary');
+        const response = await fetch('/api/weather/disaster-risk');
         const data = await response.json();
 
         if (response.ok) {
           const weatherHTML = `
             <div class="weather-item">
-              <span>🌡️ Temperature</span>
-              <strong>${data.current_conditions.temperature}°C</strong>
+              <span>ðŸŒ¡ï¸ Temperature</span>
+              <strong>${data.current_conditions.temperature}Â°C</strong>
             </div>
             <div class="weather-item">
-              <span>💧 Humidity</span>
+              <span>ðŸ’§ Humidity</span>
               <strong>${data.current_conditions.humidity}%</strong>
             </div>
             <div class="weather-item">
-              <span>💨 Wind Speed</span>
-              <strong>${data.current_conditions.wind_speed} m/s</strong>
+              <span>ðŸ’¨ Wind Speed</span>
+              <strong>${data.current_conditions.wind_speed} km/h</strong>
             </div>
             <div class="weather-item">
-              <span>🌧️ Rainfall</span>
-              <strong>${data.current_conditions.rain_now} mm</strong>
+              <span>ðŸŒ§ï¸ Rainfall</span>
+              <strong>${data.current_conditions.precipitation} mm</strong>
             </div>
           `;
           document.getElementById('weatherData').innerHTML = weatherHTML;
@@ -602,19 +538,19 @@
           const riskHTML = `
             <div class="risk-item">
               <span>Flood Risk (Now)</span>
-              <span class="risk-level risk-${data.risk_assessment.flood_risk_now.toLowerCase()}">${data.risk_assessment.flood_risk_now}</span>
+              <span class="risk-level risk-${data.risk_assessment.flood_risk.current.toLowerCase()}">${data.risk_assessment.flood_risk.current}</span>
             </div>
             <div class="risk-item">
               <span>Flood Risk (24h)</span>
-              <span class="risk-level risk-${data.risk_assessment.flood_risk_24h.toLowerCase()}">${data.risk_assessment.flood_risk_24h}</span>
+              <span class="risk-level risk-${data.risk_assessment.flood_risk.forecast_24h.toLowerCase()}">${data.risk_assessment.flood_risk.forecast_24h}</span>
             </div>
             <div class="risk-item">
               <span>Heat Risk</span>
-              <span class="risk-level risk-${data.risk_assessment.heat_risk.toLowerCase()}">${data.risk_assessment.heat_risk}</span>
+              <span class="risk-level risk-${data.risk_assessment.heat_risk.current.toLowerCase()}">${data.risk_assessment.heat_risk.current}</span>
             </div>
             <div class="risk-item">
               <span>Storm Risk</span>
-              <span class="risk-level risk-${data.risk_assessment.storm_risk.toLowerCase()}">${data.risk_assessment.storm_risk}</span>
+              <span class="risk-level risk-${data.risk_assessment.storm_risk.current.toLowerCase()}">${data.risk_assessment.storm_risk.current}</span>
             </div>
           `;
           document.getElementById('riskData').innerHTML = riskHTML;

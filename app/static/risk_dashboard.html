@@ -14,28 +14,79 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: #f5f5f5;
+      background: #F5F8FC;
       color: #2c3e50
     }
 
     .header {
-      background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
+      background: #0A2F5A;
       color: white;
-      padding: 24px 40px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #123E6D
     }
 
-    .header h1 {
-      font-size: 2em;
+    .logo-section {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+    }
+
+    .brand h1 {
+      font-size: 1.4em;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 3px;
       letter-spacing: 0.5px
     }
 
-    .header p {
-      font-size: 0.95em;
-      opacity: 0.95
+    .brand p {
+      font-size: 0.75em;
+      opacity: 0.9
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      padding: 0 24px
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 14px 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      border-radius: 0
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-bottom-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-bottom-color: white
+    }
+
+    .status-badge {
+      background: #10b981;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      margin-left: auto
     }
 
     .container {
@@ -120,7 +171,7 @@
     }
 
     .btn-primary:hover {
-      background: #1e3a8a;
+      background: #123E6D;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3)
     }
@@ -188,7 +239,7 @@
     }
 
     .ward-item.low {
-      border-left-color: #3b82f6
+      border-left-color: #1E5C96
     }
 
     .ward-item.medium {
@@ -239,7 +290,7 @@
 
     .ward-badge.low {
       background: #dbeafe;
-      color: #1e40af
+      color: #0A2F5A
     }
 
     .ward-badge.medium {
@@ -336,7 +387,7 @@
 
     .risk-low {
       background: #dbeafe;
-      color: #1e40af
+      color: #0A2F5A
     }
 
     .risk-medium {
@@ -407,32 +458,29 @@
     <div class="spinner"></div>
   </div>
 
-  <header class="header">
-    <h1>HRVC Risk Assessment Dashboard</h1>
-    <p>Hazard-Risk-Vulnerability-Capacity Analysis Engine | Real-time Flood Risk Monitoring</p>
-    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/static/punerakshak.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Risk
-        Dashboard</a>
-      <a href="/static/alerts.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Alerts</a>
-      <a href="/static/usps_dashboard.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">USPS
-        Monitor</a>
-      <a href="/static/risk_dashboard.html"
-        style="color:white;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.2);border-radius:4px;font-size:0.85em;font-weight:600">HRVC
-        Risk</a>
-      <a href="/static/drainage_simulation.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Drainage
-        Sim</a>
-      <a href="/static/decision_dashboard.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Decision
-        Engine</a>
-      <a href="/static/risk_evolution.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Risk
-        Evolution</a>
-      <a href="/static/community.html"
-        style="color:#bfdbfe;text-decoration:none;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:4px;font-size:0.85em">Community</a>
+      <header class="header">
+    <div class="logo-section">
+      <div class="brand">
+        <h1>PuneRakshak</h1>
+        <p>Disaster Risk Assessment & Monitoring System</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
+      <a href="/static/alerts.html" class="nav-btn">Alerts</a>
+      <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
+      <a href="/static/risk_dashboard.html" class="nav-btn active">HRVC Risk</a>
+      <a href="/static/drainage_simulation.html" class="nav-btn">Drainage Sim</a>
+      <a href="/static/decision_dashboard.html" class="nav-btn">Decision Engine</a>
+      <a href="/static/risk_evolution.html" class="nav-btn">Risk Evolution</a>
+      <a href="/static/monitoring_dashboard.html" class="nav-btn">Monitoring</a>
+      <a href="/static/community.html" class="nav-btn">Community</a>
+      <a href="/docs" class="nav-btn">API Docs</a>
+      <div class="status-badge">System Active</div>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
+      </div>
     </div>
   </header>
 

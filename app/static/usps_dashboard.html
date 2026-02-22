@@ -17,7 +17,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f0;
+      background: #F5F8FC;
       color: #1e3a5f;
       height: 100vh;
       display: flex;
@@ -26,16 +26,16 @@
 
     .header {
       background: #1e3a5f;
-      color: #f5f5f0;
+      color: #F5F8FC;
       padding: 0;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       border-bottom: 3px solid #152a45
     }
 
     .logo-section {
-      padding: 14px 28px;
-      background: rgba(245, 245, 240, 0.05);
-      border-bottom: 1px solid rgba(245, 245, 240, 0.1)
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
     }
 
     .brand h1 {
@@ -43,7 +43,7 @@
       font-weight: 700;
       margin-bottom: 4px;
       letter-spacing: 0.5px;
-      color: #f5f5f0
+      color: #F5F8FC
     }
 
     .brand p {
@@ -75,14 +75,14 @@
 
     .nav-btn:hover {
       background: rgba(245, 245, 240, 0.1);
-      color: #f5f5f0;
+      color: #F5F8FC;
       border-bottom-color: rgba(245, 245, 240, 0.3)
     }
 
     .nav-btn.active {
       background: rgba(245, 245, 240, 0.15);
-      color: #f5f5f0;
-      border-bottom-color: #f5f5f0
+      color: #F5F8FC;
+      border-bottom-color: #F5F8FC
     }
 
     .status-badge {
@@ -92,7 +92,7 @@
       font-size: 0.75em;
       font-weight: 600;
       margin-left: auto;
-      color: #f5f5f0
+      color: #F5F8FC
     }
 
     .main-container {
@@ -104,7 +104,7 @@
     }
 
     .sidebar {
-      background: #f5f5f0;
+      background: #F5F8FC;
       border-right: 2px solid #d4d4c8;
       overflow-y: auto;
       padding: 20px
@@ -130,7 +130,7 @@
 
     .metric-card {
       background: #1e3a5f;
-      color: #f5f5f0;
+      color: #F5F8FC;
       padding: 18px 14px;
       border-radius: 8px;
       text-align: center;
@@ -141,7 +141,7 @@
       font-size: 2.2em;
       font-weight: 800;
       line-height: 1;
-      color: #f5f5f0
+      color: #F5F8FC
     }
 
     .metric-label {
@@ -188,7 +188,7 @@
 
     .btn-primary {
       background: #1e3a5f;
-      color: #f5f5f0
+      color: #F5F8FC
     }
 
     .btn-primary:hover {
@@ -199,7 +199,7 @@
 
     .btn-success {
       background: #2d5f3f;
-      color: #f5f5f0
+      color: #F5F8FC
     }
 
     .btn-success:hover {
@@ -299,7 +299,7 @@
     }
 
     .report-panel {
-      background: #f5f5f0;
+      background: #F5F8FC;
       border-left: 2px solid #d4d4c8;
       overflow-y: auto;
       padding: 20px
@@ -433,11 +433,12 @@
     <div class="logo-section">
       <div class="brand">
         <h1>PuneRakshak</h1>
-        <p>Urban System Pressure Score (USPS) Monitor</p>
+        <p>Disaster Risk Assessment & Monitoring System</p>
       </div>
     </div>
     <div class="nav-buttons">
-      <a href="/static/punerakshak.html" class="nav-btn">Risk Dashboard</a>
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
       <a href="/static/alerts.html" class="nav-btn">Alerts</a>
       <a href="/static/usps_dashboard.html" class="nav-btn active">USPS Monitor</a>
       <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
@@ -448,8 +449,8 @@
       <a href="/static/community.html" class="nav-btn">Community</a>
       <a href="/docs" class="nav-btn">API Docs</a>
       <div class="status-badge">System Active</div>
-      <div class="status-badge" style="background:#1e3a5f;margin-left:8px">
-        <span id="time">08:10 pm</span>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
       </div>
     </div>
   </header>
@@ -479,25 +480,31 @@
       </div>
 
       <div style="margin-bottom:24px">
-        <div class="section-title">Configuration</div>
+        <div class="section-title">Environmental Parameters</div>
         <div class="form-group">
-          <label class="form-label">Visualization Mode</label>
-          <select id="mode" class="form-select">
-            <option value="usps">USPS Score</option>
-            <option value="cascade">Cascade Risk</option>
-            <option value="rain">Rain Accumulation</option>
-            <option value="drain">Drain Capacity</option>
-            <option value="road">Road Congestion</option>
-            <option value="hospital">Hospital Occupancy</option>
-            <option value="power">Power Stress</option>
-          </select>
+          <label class="form-label">Rainfall (mm/hr): <span id="rainfall-display">25</span></label>
+          <input type="range" id="rainfall" class="form-select" min="0" max="100" value="25" step="5"
+            style="width:100%;height:8px;cursor:pointer"
+            oninput="document.getElementById('rainfall-display').textContent=this.value">
         </div>
-        <button class="btn btn-primary" onclick="load()">Refresh Data</button>
-        <button class="btn btn-success" onclick="generateMonthlyReport()">Generate Monthly Report</button>
+        <div class="form-group">
+          <label class="form-label">Accumulated Rain (mm): <span id="accumulated-display">30</span></label>
+          <input type="range" id="accumulated" class="form-select" min="0" max="150" value="30" step="10"
+            style="width:100%;height:8px;cursor:pointer"
+            oninput="document.getElementById('accumulated-display').textContent=this.value">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Traffic Level: <span id="traffic-display">0.5</span></label>
+          <input type="range" id="traffic" class="form-select" min="0" max="1" value="0.5" step="0.1"
+            style="width:100%;height:8px;cursor:pointer"
+            oninput="document.getElementById('traffic-display').textContent=this.value">
+        </div>
+        <button class="btn btn-primary" onclick="load()">Calculate USPS</button>
+        <button class="btn btn-success" onclick="generateMonthlyReport()">Generate Report</button>
       </div>
 
       <div>
-        <div class="section-title">Subsystem Status</div>
+        <div class="section-title">Environmental Status</div>
         <div class="subsys-list" id="subsys-list"></div>
       </div>
     </aside>
@@ -527,7 +534,7 @@
           <span>Low (20-39)</span>
         </div>
         <div class="legend-item">
-          <div class="legend-circle" style="background:#3b82f6"></div>
+          <div class="legend-circle" style="background:#1E5C96"></div>
           <span>Minimal (0-19)</span>
         </div>
       </div>
@@ -545,27 +552,28 @@
         <div class="report-title">Infrastructure Recommendations</div>
 
         <div class="recommendation-box">
-          <div class="recommendation-title">Priority 1: Drainage System</div>
-          Upgrade drainage capacity in Wards 4, 7, and 12. Current capacity at 78% average load. Recommend increasing
-          capacity by 30% to handle monsoon peaks.
+          <div class="recommendation-title">Spatial Variation Model</div>
+          Each grid cell has unique conditions based on location. Urban core areas (within 5km of Pune center) have
+          higher traffic but better drainage infrastructure. Peripheral areas have lower traffic but older drainage
+          systems. Rainfall varies ±30% across the region.
         </div>
 
         <div class="recommendation-box">
-          <div class="recommendation-title">Priority 2: Road Network</div>
-          Implement traffic management system in high-congestion zones. Average congestion at 65% during peak hours.
-          Deploy smart traffic signals in 8 critical junctions.
+          <div class="recommendation-title">SCS-CN Hydrological Model</div>
+          Using Soil Conservation Service Curve Number method for runoff estimation. Curve numbers vary by land use:
+          Built-up (92.5), Residential (80), Vegetation (62.5). Deterministic and audit-ready calculations.
         </div>
 
         <div class="recommendation-box">
-          <div class="recommendation-title">Priority 3: Hospital Capacity</div>
-          Increase emergency bed capacity by 20% in Wards 5 and 9. Current occupancy averaging 72%. Add 2 mobile medical
-          units for rapid response.
+          <div class="recommendation-title">USPS Formula</div>
+          USPS = 0.4 × Rain Index + 0.4 × Drain Stress + 0.2 × Traffic Index<br>
+          Multi-criteria composite scoring with transparent weighted aggregation. Each cell computed independently.
         </div>
 
         <div class="recommendation-box">
-          <div class="recommendation-title">Priority 4: Power Infrastructure</div>
-          Install backup power systems in critical zones. Power stress peaks at 68% during evening hours. Deploy 5
-          additional substations in high-demand areas.
+          <div class="recommendation-title">Interactive Analysis</div>
+          Adjust base parameters using sliders above. The system applies realistic spatial variation to create diverse
+          conditions across the city. Click any map marker to see detailed metrics for that specific location.
         </div>
       </div>
 
@@ -618,59 +626,84 @@
     async function load() {
       document.getElementById('loading').style.display = 'flex';
       try {
-        const params = 'lat_min=18.45&lat_max=18.60&lon_min=73.75&lon_max=73.95';
+        // Get environmental parameters
+        const rainfall = document.getElementById('rainfall').value;
+        const accumulated = document.getElementById('accumulated').value;
+        const traffic = document.getElementById('traffic').value;
 
-        const [r1, r2, r3] = await Promise.all([
-          fetch(`/api/usps/calculate?${params}`),
-          fetch(`/api/usps/cascade-warnings?${params}`),
-          fetch(`/api/usps/subsystem-status?${params}`)
-        ]);
+        const params = `lat_min=18.45&lat_max=18.60&lon_min=73.75&lon_max=73.95&rainfall_mm=${rainfall}&accumulated_1hr=${accumulated}&traffic_level=${traffic}`;
 
-        data = {
-          usps: await r1.json(),
-          cascade: await r2.json(),
-          subsystem: await r3.json()
-        };
+        // Use Environmental Engine endpoint
+        const response = await fetch(`/api/usps/environmental-usps?${params}`);
+        data = await response.json();
 
-        document.getElementById('cells').textContent = data.usps.total_cells;
-        document.getElementById('avg').textContent = data.usps.summary.avg_usps;
-        document.getElementById('crit').textContent = data.usps.summary.critical_cells;
-        document.getElementById('casc').textContent = data.cascade.total_warnings;
+        // Update metrics
+        document.getElementById('cells').textContent = data.total_cells;
+        document.getElementById('avg').textContent = data.summary.avg_usps;
+        document.getElementById('crit').textContent = data.summary.critical_cells || 0;
+        document.getElementById('casc').textContent = data.summary.high_alert_cells || 0;
 
-        updateSubsys(data.subsystem.subsystem_status);
+        // Update environmental info display
+        updateEnvironmentalInfo(data);
         updateMonthlyStats();
-        render(data.usps.grid_cells);
+        render(data.grid_cells);
 
       } catch (e) {
         console.error('Error:', e);
-        alert('Error loading data');
+        alert('Error loading data: ' + e.message);
       } finally {
         document.getElementById('loading').style.display = 'none';
       }
     }
 
-    function updateSubsys(subsystems) {
-      const names = {
-        rain_accumulation: 'Rain Accumulation',
-        drain_capacity_load: 'Drain Capacity',
-        road_congestion: 'Road Congestion',
-        hospital_occupancy: 'Hospital Occupancy',
-        power_stress: 'Power Stress'
-      };
+    function updateEnvironmentalInfo(data) {
+      const severity = data.summary.severity_distribution || {};
+      const methodology = data.methodology || {};
 
-      const html = Object.entries(subsystems).map(([key, value]) => {
-        const pressure = value.avg_pressure;
-        const color = pressure >= 80 ? '#8b0000' : pressure >= 60 ? '#f59e0b' : pressure >= 40 ? '#fbbf24' : '#10b981';
-        return `<div class="subsys-item">
+      const html = `
+        <div class="subsys-item" style="border-left-color:#1E5C96">
           <div class="subsys-header">
-            <span class="subsys-name">${names[key]}</span>
-            <span class="subsys-value">${pressure.toFixed(0)}%</span>
+            <span class="subsys-name">Model</span>
+            <span class="subsys-value">${data.model || 'Environmental Engine'}</span>
+          </div>
+        </div>
+        <div class="subsys-item" style="border-left-color:#10b981">
+          <div class="subsys-header">
+            <span class="subsys-name">Stable Cells</span>
+            <span class="subsys-value">${severity.Stable || 0}</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill" style="width:${pressure}%;background:${color}"></div>
+            <div class="progress-fill" style="width:${(severity.Stable / data.total_cells * 100) || 0}%;background:#10b981"></div>
           </div>
-        </div>`;
-      }).join('');
+        </div>
+        <div class="subsys-item" style="border-left-color:#fbbf24">
+          <div class="subsys-header">
+            <span class="subsys-name">Watch Cells</span>
+            <span class="subsys-value">${severity.Watch || 0}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${(severity.Watch / data.total_cells * 100) || 0}%;background:#fbbf24"></div>
+          </div>
+        </div>
+        <div class="subsys-item" style="border-left-color:#f59e0b">
+          <div class="subsys-header">
+            <span class="subsys-name">High Alert Cells</span>
+            <span class="subsys-value">${severity['High Alert'] || 0}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${(severity['High Alert'] / data.total_cells * 100) || 0}%;background:#f59e0b"></div>
+          </div>
+        </div>
+        <div class="subsys-item" style="border-left-color:#8b0000">
+          <div class="subsys-header">
+            <span class="subsys-name">Critical Cells</span>
+            <span class="subsys-value">${severity.Critical || 0}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${(severity.Critical / data.total_cells * 100) || 0}%;background:#8b0000"></div>
+          </div>
+        </div>
+      `;
 
       document.getElementById('subsys-list').innerHTML = html;
     }
@@ -678,25 +711,10 @@
     function render(cells) {
       if (scatterLayer) map.removeLayer(scatterLayer);
 
-      const mode = document.getElementById('mode').value;
-
       // Create scatter plot with sized circles
       const markers = cells.map(c => {
-        let value;
-        if (mode === 'usps') {
-          value = c.usps_score;
-        } else if (mode === 'cascade') {
-          value = (c.cascade_analysis.systems_at_risk / 5) * 100;
-        } else {
-          const modeMap = {
-            rain: 'rain_accumulation',
-            drain: 'drain_capacity_load',
-            road: 'road_congestion',
-            hospital: 'hospital_occupancy',
-            power: 'power_stress'
-          };
-          value = c.subsystem_pressures[modeMap[mode]];
-        }
+        const value = c.usps_score;
+        const env = c.environmental || {};
 
         const color = getColorForValue(value);
         const radius = 4 + (value / 100) * 8; // Size based on value
@@ -712,10 +730,22 @@
 
         circle.bindPopup(`
           <div style="font-family:Arial;font-size:0.85em;color:#1e3a5f">
-            <strong>Cell ${c.cell_id} - ${c.ward_name}</strong><br>
-            USPS Score: <strong>${c.usps_score.toFixed(1)}</strong><br>
-            Systems at Risk: ${c.cascade_analysis.systems_at_risk}<br>
-            Cascade Level: ${c.cascade_analysis.cascade_level}
+            <strong>Cell ${c.cell_id} - ${c.ward_name || 'Ward'}</strong><br>
+            <strong>USPS Score: ${value.toFixed(1)}</strong><br>
+            Severity: <strong>${c.severity_level || env.severity_level}</strong><br>
+            <hr style="margin:6px 0;border:none;border-top:1px solid #d4d4c8">
+            <em>Environmental Metrics:</em><br>
+            Rainfall: ${env.actual_rainfall_mm?.toFixed(1) || 'N/A'} mm/hr<br>
+            Rain Index: ${(env.rain_index * 100).toFixed(1)}%<br>
+            Runoff: ${env.runoff_mm?.toFixed(2) || 0} mm<br>
+            Drain Stress: ${(env.drain_stress * 100).toFixed(1)}%<br>
+            Traffic: ${(env.actual_traffic * 100)?.toFixed(1) || 'N/A'}%<br>
+            Traffic Index: ${(env.traffic_index * 100).toFixed(1)}%<br>
+            <hr style="margin:6px 0;border:none;border-top:1px solid #d4d4c8">
+            <em>Infrastructure:</em><br>
+            Land Use: ${env.land_use || c.land_use || 'Mixed'}<br>
+            Curve Number: ${env.curve_number?.toFixed(1) || 'N/A'}<br>
+            Drain Capacity: ${env.drain_capacity_m3?.toFixed(0) || 'N/A'} m³
           </div>
         `);
 
@@ -731,7 +761,7 @@
       if (value >= 60) return '#f59e0b';
       if (value >= 40) return '#fbbf24';
       if (value >= 20) return '#10b981';
-      return '#3b82f6';
+      return '#1E5C96';
     }
 
     function updateMonthlyStats() {
@@ -898,10 +928,6 @@ Contact: disaster-management@punecorp.gov.in
 
       alert('Monthly report generated and downloaded successfully!');
     }
-
-    document.getElementById('mode').addEventListener('change', () => {
-      if (data) render(data.usps.grid_cells);
-    });
 
     initMap();
     load();

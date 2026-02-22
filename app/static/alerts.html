@@ -14,7 +14,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: #f5f7fa;
+      background: #F5F8FC;
       color: #2c3e50;
       min-height: 100vh;
       display: flex;
@@ -22,11 +22,11 @@
     }
 
     .header {
-      background: #1e40af;
+      background: #0A2F5A;
       color: white;
       padding: 0;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #1e3a8a
+      border-bottom: 3px solid #123E6D
     }
 
     .logo-section {
@@ -127,7 +127,7 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      border-left: 4px solid #3b82f6
+      border-left: 4px solid #1E5C96
     }
 
     .stat-box.critical {
@@ -196,7 +196,7 @@
     }
 
     thead {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      background: #0A2F5A;
       color: white
     }
 
@@ -221,7 +221,7 @@
 
     .alert-id {
       font-weight: 700;
-      color: #2563eb
+      color: #1E5C96
     }
 
     .severity-badge {
@@ -273,7 +273,7 @@
 
     .action-btn {
       padding: 6px 14px;
-      background: #3b82f6;
+      background: #1E5C96;
       color: white;
       border: none;
       border-radius: 6px;
@@ -284,7 +284,7 @@
     }
 
     .action-btn:hover {
-      background: #2563eb;
+      background: #1E5C96;
       transform: translateY(-1px)
     }
 
@@ -316,7 +316,7 @@
     }
 
     .modal-header {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      background: #0A2F5A;
       color: white;
       padding: 18px 20px;
       border-radius: 10px 10px 0 0;
@@ -424,7 +424,7 @@
       width: 50px;
       height: 50px;
       border: 4px solid #e5e7eb;
-      border-top: 4px solid #3b82f6;
+      border-top: 4px solid #1E5C96;
       border-radius: 50%;
       animation: spin 1s linear infinite
     }
@@ -446,7 +446,7 @@
     <div class="spinner"></div>
   </div>
 
-  <header class="header">
+      <header class="header">
     <div class="logo-section">
       <div class="brand">
         <h1>PuneRakshak</h1>
@@ -454,7 +454,8 @@
       </div>
     </div>
     <div class="nav-buttons">
-      <a href="/static/punerakshak.html" class="nav-btn">Risk Dashboard</a>
+      <a href="/static/forecast_dashboard.html" class="nav-btn">AI Forecast</a>
+      <a href="/static/punerakshak.html" class="nav-btn">Risk Analysis</a>
       <a href="/static/alerts.html" class="nav-btn active">Alerts</a>
       <a href="/static/usps_dashboard.html" class="nav-btn">USPS Monitor</a>
       <a href="/static/risk_dashboard.html" class="nav-btn">HRVC Risk</a>
@@ -465,8 +466,8 @@
       <a href="/static/community.html" class="nav-btn">Community</a>
       <a href="/docs" class="nav-btn">API Docs</a>
       <div class="status-badge">System Active</div>
-      <div class="status-badge" style="background:#3b82f6;margin-left:8px">
-        <span id="time">08:10 pm</span>
+      <div class="status-badge" style="background:#1E5C96;margin-left:8px">
+        <span id="time">--:--</span>
       </div>
     </div>
   </header>

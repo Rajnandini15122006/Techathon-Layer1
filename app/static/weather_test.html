@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather API Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #0A2F5A;
+    }
+
+    h2 {
+      color: #123E6D;
+      border-bottom: 2px solid #0A2F5A;
+      padding-bottom: 8px;
+    }
+
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .loading {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    pre {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      border: 1px solid #dee2e6;
+    }
+
+    button {
+      background: #0A2F5A;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #123E6D;
+    }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .weather-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #0A2F5A;
+    }
+
+    .weather-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #0A2F5A;
+    }
+
+    .weather-label {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🌦️ Open-Meteo Weather API Test</h1>
+
+  <div class="container">
+    <h2>Quick Tests</h2>
+    <button onclick="testCurrent()">Test Current Weather</button>
+    <button onclick="testDisasterRisk()">Test Disaster Risk</button>
+    <button onclick="testForecast()">Test Forecast</button>
+    <button onclick="testPuneOverview()">Test Pune Overview</button>
+  </div>
+
+  <div class="container">
+    <h2>Current Weather - Pune</h2>
+    <div id="currentStatus" class="status loading">Loading...</div>
+    <div id="currentWeather" class="weather-grid"></div>
+    <pre id="currentData"></pre>
+  </div>
+
+  <div class="container">
+    <h2>Disaster Risk Assessment</h2>
+    <div id="riskStatus" class="status loading">Loading...</div>
+    <div id="riskData"></div>
+    <pre id="riskJson"></pre>
+  </div>
+
+  <div class="container">
+    <h2>API Response Log</h2>
+    <pre id="log"></pre>
+  </div>
+
+  <script>
+    function log(message) {
+      const logEl = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logEl.textContent += `[${timestamp}] ${message}\n`;
+    }
+
+    async function testCurrent() {
+      log('Testing /api/weather/current...');
+      try {
+        const response = await fetch('/api/weather/current');
+        log(`Response status: ${response.status}`);
+
+        const data = await response.json();
+        log('Response received successfully');
+
+        document.getElementById('currentStatus').className = 'status success';
+        document.getElementById('currentStatus').textContent = '✓ API Working - Data Loaded';
+
+        const weather = data.data;
+        document.getElementById('currentWeather').innerHTML = `
+          <div class="weather-card">
+            <div class="weather-value">${weather.temperature}°C</div>
+            <div class="weather-label">Temperature</div>
+          </div>
+          <div class="weather-card">
+            <div class="weather-value">${weather.humidity}%</div>
+            <div class="weather-label">Humidity</div>
+          </div>
+          <div class="weather-card">
+            <div class="weather-value">${weather.wind_speed}</div>
+            <div class="weather-label">Wind (km/h)</div>
+          </div>
+          <div class="weather-card">
+            <div class="weather-value">${weather.precipitation}</div>
+            <div class="weather-label">Rain (mm)</div>
+          </div>
+        `;
+
+        document.getElementById('currentData').textContent = JSON.stringify(data, null, 2);
+        log('✓ Current weather displayed');
+      } catch (error) {
+        log(`✗ Error: ${error.message}`);
+        document.getElementById('currentStatus').className = 'status error';
+        document.getElementById('currentStatus').textContent = `✗ Error: ${error.message}`;
+      }
+    }
+
+    async function testDisasterRisk() {
+      log('Testing /api/weather/disaster-risk...');
+      try {
+        const response = await fetch('/api/weather/disaster-risk');
+        log(`Response status: ${response.status}`);
+
+        const data = await response.json();
+        log('Response received successfully');
+
+        document.getElementById('riskStatus').className = 'status success';
+        document.getElementById('riskStatus').textContent = '✓ API Working - Risk Data Loaded';
+
+        const risks = data.risk_assessment;
+        document.getElementById('riskData').innerHTML = `
+          <div class="weather-grid">
+            <div class="weather-card">
+              <div class="weather-value">${risks.flood_risk.current}</div>
+              <div class="weather-label">Flood Risk (Now)</div>
+            </div>
+            <div class="weather-card">
+              <div class="weather-value">${risks.flood_risk.forecast_24h}</div>
+              <div class="weather-label">Flood Risk (24h)</div>
+            </div>
+            <div class="weather-card">
+              <div class="weather-value">${risks.heat_risk.current}</div>
+              <div class="weather-label">Heat Risk</div>
+            </div>
+            <div class="weather-card">
+              <div class="weather-value">${risks.storm_risk.current}</div>
+              <div class="weather-label">Storm Risk</div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('riskJson').textContent = JSON.stringify(data, null, 2);
+        log('✓ Risk assessment displayed');
+      } catch (error) {
+        log(`✗ Error: ${error.message}`);
+        document.getElementById('riskStatus').className = 'status error';
+        document.getElementById('riskStatus').textContent = `✗ Error: ${error.message}`;
+      }
+    }
+
+    async function testForecast() {
+      log('Testing /api/weather/forecast...');
+      try {
+        const response = await fetch('/api/weather/forecast?hours=24');
+        const data = await response.json();
+        log('✓ Forecast data received');
+        log(`Total rain (24h): ${data.data.summary.total_precipitation_mm} mm`);
+        alert(`Forecast loaded! Total rain (24h): ${data.data.summary.total_precipitation_mm} mm`);
+      } catch (error) {
+        log(`✗ Error: ${error.message}`);
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    async function testPuneOverview() {
+      log('Testing /api/weather/pune-overview...');
+      try {
+        const response = await fetch('/api/weather/pune-overview');
+        const data = await response.json();
+        log('✓ Pune overview received');
+        log(`Current: ${data.current.temperature}°C, ${data.current.weather}`);
+        alert(`Pune Weather: ${data.current.temperature}°C, ${data.current.weather}`);
+      } catch (error) {
+        log(`✗ Error: ${error.message}`);
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    // Auto-load on page load
+    window.addEventListener('load', () => {
+      log('Page loaded - Starting tests...');
+      testCurrent();
+      setTimeout(() => testDisasterRisk(), 1000);
+    });
+  </script>
+</body>
+
+</html>
